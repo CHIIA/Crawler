@@ -10,9 +10,11 @@ class FectivaSpider(scrapy.Spider):
     def start_requests(self):
         post_data = "ftx=Australia"
         search_url = 'https://global-factiva-com.virtual.anu.edu.au/ha/default.aspx'
-        post_header={}
+        body = urlparse.urlencode({
+            "ftx":"Chin* and Australia and invest*"
+        })
         post_header["Content-Type"] = "application/x-www-form-urlencoded; charset=UTF-8" 
-        yield Request(url=search_url, method='POST',headers= post_header, body=post_data,
+        yield Request(url=search_url, method='POST',headers= post_header, data=body,
                           callback=self.parse)
 
     
