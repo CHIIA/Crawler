@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
 from scrapy.http import Request
+from scrapy.http import FormRequest
 
 class FectivaSpider(scrapy.Spider):
     name = 'fectiva'
@@ -10,11 +11,9 @@ class FectivaSpider(scrapy.Spider):
     def start_requests(self):
         post_data = "ftx=Australia"
         search_url = 'https://global-factiva-com.virtual.anu.edu.au/ha/default.aspx'
-        body = urlparse.urlencode({
-            "ftx":"Chin* and Australia and invest*"
-        })
-        post_header["Content-Type"] = "application/x-www-form-urlencoded; charset=UTF-8" 
-        yield Request(url=search_url, method='POST',headers= post_header, data=body,
+        body = "ftx=Chin*"
+        headers = {"Content-Type": "application/x-www-form-urlencoded"}
+        yield FormRequest(url=search_url,formdata={'ftx': 'Chin*'},
                           callback=self.parse)
 
     

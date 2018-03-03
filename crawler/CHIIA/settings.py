@@ -15,13 +15,13 @@ SPIDER_MODULES = ['CHIIA.spiders']
 NEWSPIDER_MODULE = 'CHIIA.spiders'
 
 #Maxim proxy using in proxy pool
-MAX_PROXY_USING = -1
+#MAX_PROXY_USING = -1
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'CHIIA (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 CONCURRENT_REQUESTS = 16
