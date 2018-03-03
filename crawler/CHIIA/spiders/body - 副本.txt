@@ -1,0 +1,43 @@
+__VIEWSTATE:
+assistedSearch:1
+cop:Or
+dateFrom_extc_ClientState:{"CalendarPosition":1,"CalendarDateDisplayFormat":"d MMMM yyyy","CalendarMonthYearDisplayFormat":"MMM, yyyy"}
+dateFrom_extc__MaskedEditExtender_ClientState:
+dateFrom_txb:________
+dateTo_extc_ClientState:{"CalendarPosition":0,"CalendarDateDisplayFormat":"d MMMM yyyy","CalendarMonthYearDisplayFormat":"MMM, yyyy"}
+dateTo_extc__MaskedEditExtender_ClientState:
+dateTo_txb:________
+dfmt:DDMMCCYY
+directLinkURLHRef:https://global-factiva-com.virtual.anu.edu.au/en/du/search.asp?accountid=9AUS001400&namespace=16
+directLinkURLName:Factiva
+dr:Last3Months
+excDiscSrcs:on
+excDiscSrcslk:on
+flagBox:lo
+ftx: fuck* and australia
+hs:0
+hso:PublicationDateMostRecentFirst
+ht:Advanced
+iadmio:False
+inasm:false
+iop:Or
+ipcl:[EN]
+ipgi:False
+isrd:Medium
+isst:LegacySavedSearch
+ist:Advanced
+isteo:False
+ister:True
+ister_bool:True
+istesfn:False
+rop:Or
+sbFTQSize:2048
+scrAllBlg:{14:6,0:0,11:"B|",12:0,4:0,5:0,6:0,7:0,8:"All Blogs",10:0}
+scrAllMlt:{14:5,0:0,11:"M|",12:0,4:0,5:0,6:0,7:0,8:"All Multimedia",10:0}
+scrAllPic:{14:2,0:0,11:"I|",12:0,4:0,5:0,6:0,7:0,8:"All Pictures",10:0}
+scrAllPub:{14:1,0:0,11:"P|",12:0,4:0,5:0,6:0,7:0,8:"All Publications",10:0}
+scrAllWeb:{14:3,0:0,11:"W|",12:0,4:0,5:0,6:0,7:0,8:"All Web News",10:0}
+searchBuilder:1
+sop:Or
+srcNmOnly:on
+srcNmOnlylk:on

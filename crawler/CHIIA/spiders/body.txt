@@ -1,0 +1,96 @@
+__VIEWSTATE:
+aicr:0
+als:[]
+assistedSearch:1
+atx:
+aus:[]
+cicr:0
+cls:[]
+cop:Or
+cos:[]
+dateFrom_extc_ClientState:{"CalendarPosition":1,"CalendarDateDisplayFormat":"d MMMM yyyy","CalendarMonthYearDisplayFormat":"MMM, yyyy"}
+dateFrom_extc__MaskedEditExtender_ClientState:
+dateFrom_txb:________
+dateTo_extc_ClientState:{"CalendarPosition":0,"CalendarDateDisplayFormat":"d MMMM yyyy","CalendarMonthYearDisplayFormat":"MMM, yyyy"}
+dateTo_extc__MaskedEditExtender_ClientState:
+dateTo_txb:________
+dfmt:DDMMCCYY
+directLinkURLHRef:https://global-factiva-com.virtual.anu.edu.au/en/du/search.asp?accountid=9AUS001400&namespace=16
+directLinkURLName:Factiva
+dr:Last3Months
+excDiscSrcs:on
+excDiscSrcslk:on
+fess:[]
+flagBox:lo
+frd:
+frdt:
+frm:
+fry:
+ftx: fuck* and australia
+hs:0
+hso:PublicationDateMostRecentFirst
+ht:Advanced
+htx:
+iadmio:False
+iceu:0
+iefs:[]
+iicr:0
+ils:[]
+inasm:false
+ins:[]
+iop:Or
+ipcl:[EN]
+ipgi:False
+ipid:
+ipin:
+isrd:Medium
+isst:LegacySavedSearch
+ist:Advanced
+isteo:False
+ister:True
+ister_bool:True
+istesfn:False
+nls:[]
+nsicr:0
+nss:[]
+ntx:
+otx:
+pecr:0
+pes:[]
+pls:[]
+res:[]
+ricr:0
+rls:[]
+rop:Or
+sbFTQSize:2048
+scrAllBlg:{14:6,0:0,11:"B|",12:0,4:0,5:0,6:0,7:0,8:"All Blogs",10:0}
+scrAllMlt:{14:5,0:0,11:"M|",12:0,4:0,5:0,6:0,7:0,8:"All Multimedia",10:0}
+scrAllPic:{14:2,0:0,11:"I|",12:0,4:0,5:0,6:0,7:0,8:"All Pictures",10:0}
+scrAllPub:{14:1,0:0,11:"P|",12:0,4:0,5:0,6:0,7:0,8:"All Publications",10:0}
+scrAllWeb:{14:3,0:0,11:"W|",12:0,4:0,5:0,6:0,7:0,8:"All Web News",10:0}
+scs:[]
+searchBuilder:1
+sfd:
+sicr:0
+sls:[]
+sop:Or
+srcNmOnly:on
+srcNmOnlylk:on
+tod:
+todt:
+tom:
+toy:
+xau:[]
+xaul:[]
+xcl:[]
+xco:[]
+xil:[]
+xin:[]
+xnl:[]
+xns:[]
+xpe:[]
+xpl:[]
+xre:[]
+xrl:[]
+xsc:[]
+xsls:[]
