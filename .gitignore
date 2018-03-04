@@ -1,1 +1,5 @@
 *.DS_Store
+crawler/CHIIA/logs
+*.html
+*.png
+*.jpg
