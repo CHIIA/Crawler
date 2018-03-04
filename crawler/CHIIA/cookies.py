@@ -105,11 +105,14 @@ def get_cookie_with_login(account,pwd):
             FLAG_LOGIN = True
         except NoSuchElementException:
             print('No Element')
+            browser.close()
         except ElementNotVisibleException:
             print('Not Visible')
+            browser.close()
         except TimeoutException:
             print('Timeout')
             browser.get_screenshot_as_file("logs/capture.png")
+            browser.close()
     list_cookies = browser.get_cookies()
     cookies=dict()
     for item in list_cookies:

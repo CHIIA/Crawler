@@ -21,15 +21,19 @@ class FectivaSpider(scrapy.Spider):
                           callback=self.parse_search)
 
     def parse_redirect(self,response):
+        self.i+=1
         redirect_url = 'https://global-factiva-com.virtual.anu.edu.au/ga/default.aspx'
-        key=re.search(r'doLinkPost\(\".*\,\"(.*)\,\"(.*)"\)',response.body.decode('utf-8'))
+        filename = 'raw/%d.html' % self.i
+        with open(filename, 'wb') as f:
+            f.write(response.body)
+        key=re.search(r'doLinkPost\(\".*\,\"(.*)\"\,\"(.*)"\)',response.body.decode('utf-8'))
         xformstate = key.group(1)
         xformsesstate = key.group(2)
-        print(xformstate)
+        #print(xformstate,'\n\n')
+        #print(xformsesstate,'\n\n')
         yield FormRequest(url=redirect_url,formdata={'_XFORMSTATE':xformstate ,'_XFORMSESSSTATE':xformsesstate},
                           callback=self.parse_article)
     def parse_article(self,response):
-        self.i+=1
         filename = 'articles/%d.html' % self.i
         with open(filename, 'wb') as f:
             f.write(response.body)

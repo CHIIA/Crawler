@@ -12,10 +12,10 @@ for item in soup.find_all("a","enHeadline"):
 '''
 import re
 
-f = open(r'articles/1.html','rb')
+f = open(r'raw/1.html','rb')
 content = f.read().decode('utf-8')
 f.close()
-s=re.search(r'doLinkPost\(\".*\,\"(.*)\,\"(.*)"\)',content)
+s=re.search(r'doLinkPost\(\".*\,\"(.*)\"\,\"(.*)"\)',content)
 
 
 print(s.group(1),'\n\n',s.group(2))
