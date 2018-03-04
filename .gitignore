@@ -1,5 +1,7 @@
 *.DS_Store
 crawler/CHIIA/logs
+crawler/CHIIA/articles
+__pycache__
 *.html
 *.png
 *.jpg
