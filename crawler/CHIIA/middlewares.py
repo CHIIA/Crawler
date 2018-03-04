@@ -17,14 +17,12 @@ class UserAgentMiddleware(object):
     """ 换User-Agent """
     
     def process_request(self, request, spider):
-        spider.logger.info('change agent')
         agent = random.choice(agents)
         request.headers["User-Agent"] = agent
 
 class CookiesMiddleware(object):
     """ 换Cookie """
     def process_request(self, request, spider):
-        spider.logger.info('change cookie')
         req_cookie = random.choice(cookie)
         req_cookie = json.loads(req_cookie)
         request.cookies = req_cookie
