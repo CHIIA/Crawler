@@ -1,7 +1,6 @@
 *.DS_Store
 crawler/CHIIA/logs
 crawler/CHIIA/articles
-crawler/CHIIA/database
 __pycache__
 *.html
 *.png
