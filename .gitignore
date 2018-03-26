@@ -4,6 +4,5 @@ crawler/CHIIA/articles
 crawler/CHIIA/database
 __pycache__
 *.html
-*.png
 *.jpg
 *.pyc
