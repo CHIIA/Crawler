@@ -4,6 +4,17 @@ This wen crawler based on scrapy framework.
 Using selenium and headless chrome to obtain cookie from fectiva.
 Mongodb to store all the data in database.
 
+## Architecture Design
+
+![Architecture](https://github.com/CHIIA/Crawler/blob/master/DOCS/images/function_design.png)
+
+## Sequence Digram
+
+![Sequence](https://github.com/CHIIA/Crawler/blob/master/DOCS/images/sequence_diagram.png)
+
+## Progress
+
+![Progress](https://github.com/CHIIA/Crawler/blob/master/DOCS/images/progress.png)
 
 ## Environment Setup
 > source venv/bin/activate
@@ -24,7 +35,7 @@ Mongodb to store all the data in database.
 ## Directory Structure
 
 <pre>
-project                                      scrapy module dirs
+project                                   scrapy module dirs
 ├── CHIIA
 │   ├── __init__.py
 │   ├── chromedriver                      headless chrome driver for whole platforms
