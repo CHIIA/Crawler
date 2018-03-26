@@ -17,3 +17,10 @@ class ArticleItem(Item):
     CrawlDate = Field()
     Class = Field()
 
+class PDFItem(Item):
+    """ Article structure """
+    _id = Field()
+    Title = Field()  # wechat_id
+    Xformstate = Field()
+    SessionDto = Field()
+

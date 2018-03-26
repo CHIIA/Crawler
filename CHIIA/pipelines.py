@@ -25,3 +25,9 @@ class MongoDBPipleline(object):
                 pass
 
         return item
+'''
+class PDFPipeline(FilesPipeline):
+    def get_pdf_requests(self,item,info):
+        for url in item[
+
+'''

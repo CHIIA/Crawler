@@ -6,7 +6,7 @@ from scrapy.http import Request
 from scrapy.http import FormRequest
 from bs4 import BeautifulSoup
 import re
-from CHIIA.items import ArticleItem
+from CHIIA.items import ArticleItem,PDFItem
 import logging
 logger = logging.getLogger(__name__)
 
@@ -43,6 +43,15 @@ class FectivaSpider(scrapy.Spider):
         content = response.body.decode('utf-8')
         soup = BeautifulSoup(content,"html.parser")
         
+        pdfitem = PDFItem()
+        pdfitem['_id'] = soup.find("div","article").get('id')
+        pdfitem['Title'] = soup.find("span","enHeadline").getText()
+        pdfitem['url'] = 'https://global-factiva-com.virtual.anu.edu.au/pps/default.aspx?pp=PDF&ppstype=Article'
+        pdfitem['Xformstate'],_ = self.get_formbody(content)
+        pdfitem['SessionDto'] = re.search(r'sessionDto:\'(.*)\',',content).group(1)
+        #download pdfitem through filepipeline
+        yield pdfitem
+        
         articleitems = ArticleItem()
         articleitems['_id'] = soup.find("div","article").get('id')
         articleitems['Title'] = soup.find("span","enHeadline").getText()
@@ -55,11 +64,11 @@ class FectivaSpider(scrapy.Spider):
         #logger.info('Start crawing:{}...'.format(articleitems['Title']))
         #print('id:',articleitems['_id'],'title: ',articleitems['Title'])
         yield articleitems
-        '''
+        
         filename = 'articles/%d.html' % self.i
         with open(filename, 'wb') as f:
             f.write(response.body)
-        '''
+
     def get_formbody(self,response_body):
         soup = BeautifulSoup(response_body,"html.parser")
         xformstate = None
