@@ -10,6 +10,10 @@ from CHIIA.items import ArticleItem,PDFItem
 import logging
 logger = logging.getLogger(__name__)
 
+try:
+    from cStringIO import StringIO as BytesIO
+except ImportError:
+    from io import BytesIO
 
 class FectivaSpider(scrapy.Spider):
     name = 'fectiva'
@@ -43,14 +47,7 @@ class FectivaSpider(scrapy.Spider):
         content = response.body.decode('utf-8')
         soup = BeautifulSoup(content,"html.parser")
         
-        pdfitem = PDFItem()
-        pdfitem['_id'] = soup.find("div","article").get('id')
-        pdfitem['Title'] = soup.find("span","enHeadline").getText()
-        pdfitem['url'] = 'https://global-factiva-com.virtual.anu.edu.au/pps/default.aspx?pp=PDF&ppstype=Article'
-        pdfitem['Xformstate'],_ = self.get_formbody(content)
-        pdfitem['SessionDto'] = re.search(r'sessionDto:\'(.*)\',',content).group(1)
-        #download pdfitem through filepipeline
-        yield pdfitem
+       
         
         articleitems = ArticleItem()
         articleitems['_id'] = soup.find("div","article").get('id')
@@ -63,11 +60,40 @@ class FectivaSpider(scrapy.Spider):
         
         #logger.info('Start crawing:{}...'.format(articleitems['Title']))
         #print('id:',articleitems['_id'],'title: ',articleitems['Title'])
-        yield articleitems
+ 
+ 
+        pdfitem = PDFItem()
+        pdfitem['_id'] = soup.find("div","article").get('id')
+        pdfitem['Title'] = soup.find("span","enHeadline").getText()
+        pdfitem['url'] = 'https://global-factiva-com.virtual.anu.edu.au/pps/default.aspx?pp=PDF&ppstype=Article'
+        pdfitem['Xformstate'],_ = self.get_formbody(content)
+        pdfitem['SessionDto'] = re.search(r'sessionDto:\'(.*)\',isAdmin',content).group(1)
+        #download pdfitem through filepipeline
+        #yield pdfitem
         
+        hdl = [{0:pdfitem['_id'].split('-')[1],1:0,3:{0:'article'},5:'',6:1,10:0,11:0}]
+        #yield FormRequest(url=item['url'],formdata={'_XFORMSTATE':item['Xformstate'] ,'_XFORMSESSSTATE':item['SessionDto'], 'hdl' : str(hdl)},dont_filter=True)
+        logger.info('yield!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+        yield FormRequest(url=pdfitem['url'],formdata={'_XFORMSTATE':pdfitem['Xformstate'] ,'_XFORMSESSSTATE':pdfitem['SessionDto'], 'hdl' : str(hdl)},dont_filter=True, callback=self.save_PDFfile, meta={'filename': pdfitem['_id']})
+        
+        #yield articleitems
+        '''
         filename = 'articles/%d.html' % self.i
         with open(filename, 'wb') as f:
             f.write(response.body)
+        '''
+    
+    def save_PDFfile(self,response):
+        print(response.meta['filename'])
+       
+        filename = str(response.meta['filename'])
+        print(filename)
+        logger.info('save pdf!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+        buf = BytesIO(response.body)
+        buf.seek(0)
+        path = 'articles/{}.pdf'.format(filename)
+        with open(path, 'wb') as f:
+            f.write(buf.getvalue())
 
     def get_formbody(self,response_body):
         soup = BeautifulSoup(response_body,"html.parser")

@@ -20,7 +20,11 @@ class ArticleItem(Item):
 class PDFItem(Item):
     """ Article structure """
     _id = Field()
+    url = Field()
     Title = Field()  # wechat_id
     Xformstate = Field()
     SessionDto = Field()
+    file_paths = Field()
+
+
 

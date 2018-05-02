@@ -55,9 +55,10 @@ DOWNLOAD_DELAY = 1
 # Enable or disable downloader middlewares
 # See http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-    "CHIIA.middlewares.UserAgentMiddleware": 401,
-    "CHIIA.middlewares.CookiesMiddleware": 402,
+    "CHIIA.middlewares.UserAgentMiddleware": 301,
+    "CHIIA.middlewares.CookiesMiddleware": 302,
 }
+DOWNLOAD_TIMEOUT = 200
 
 # Enable or disable extensions
 # See http://scrapy.readthedocs.org/en/latest/topics/extensions.html
@@ -68,9 +69,12 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'CHIIA.pipelines.MongoDBPipleline': 300,
-}
+    'CHIIA.pipelines.MongoDBPipleline': 401,
+#'CHIIA.pipelines.PDFPipeline': 400,
 
+}
+FILES_STORE = './articles'
+#MEDIA_ALLOW_REDIRECTS = True
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See http://doc.scrapy.org/en/latest/topics/autothrottle.html
 #AUTOTHROTTLE_ENABLED = True

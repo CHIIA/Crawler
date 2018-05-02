@@ -2,6 +2,7 @@
 crawler/CHIIA/logs
 crawler/CHIIA/articles
 crawler/CHIIA/database
+crawler/CHIIA/articles
 __pycache__
 *.html
 *.jpg

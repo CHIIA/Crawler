@@ -34,7 +34,7 @@ else:
 def get_cookie_without_login():
     #login by using headless chrome
     chrome_options = Options()
-    chrome_options.add_argument("--headless")
+    #chrome_options.add_argument("--headless")
     chrome_options.add_argument("--window-size=1920x1080")
 
     # download the chrome browser from https://sites.google.com/a/chromium.org/chromebrowser/downloads and put it in the
@@ -90,7 +90,7 @@ def get_cookie_with_login(account,pwd):
             browser.get_screenshot_as_file("logs/pre-login.png")
             password.send_keys(Keys.RETURN)
            
-            wait = WebDriverWait(browser, 10)
+            wait = WebDriverWait(browser, 70)
             browser.get_screenshot_as_file("logs/login.png")
             btn = wait.until(EC.presence_of_element_located((By.ID, 'btnSearchBottom')))
             #swith from smart search to fix search

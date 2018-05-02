@@ -5,7 +5,16 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import pymongo
-from CHIIA.items import ArticleItem
+from CHIIA.items import ArticleItem,PDFItem
+from scrapy.http import FormRequest
+from scrapy.pipelines.files import FilesPipeline
+from scrapy.exceptions import DropItem
+
+
+try:
+    from cStringIO import StringIO as BytesIO
+except ImportError:
+    from io import BytesIO
 
 
 class MongoDBPipleline(object):
@@ -23,11 +32,6 @@ class MongoDBPipleline(object):
                 self.Articles.insert(dict(item))
             except Exception:
                 pass
-
         return item
-'''
-class PDFPipeline(FilesPipeline):
-    def get_pdf_requests(self,item,info):
-        for url in item[
 
-'''
+
