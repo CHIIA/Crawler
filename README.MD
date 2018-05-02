@@ -1,9 +1,21 @@
 # Submodule for CHIIA-NLP
 
-This wen crawler based on scrapy framework.
-Using selenium and headless chrome to obtain cookie from fectiva.
-Mongodb to store all the data in database.
+## Introduction
 
+Scrapy is an application framework written for crawling web site data and extracting structured data. It is a fast, high-level screen capture and web crawler framework developed in Python for grabbing web sites and extracting structured data from pages. Scrapy is widely used for data mining, monitoring and automated testing.
+This system use headless chrome for login, Scrapy framework for crawling Fectiva database data and store them into MongoDB.
+
+## Architecture Design
+
+![Architecture](https://github.com/CHIIA/Crawler/blob/master/DOCS/images/function_design.png)
+
+## Sequence Diagram
+
+![Sequence](https://github.com/CHIIA/Crawler/blob/master/DOCS/images/sequence_diagram.png)
+
+## Progress
+
+![Progress](https://github.com/CHIIA/Crawler/blob/master/DOCS/images/progress.png)
 
 ## Environment Setup
 > source venv/bin/activate
@@ -24,7 +36,7 @@ Mongodb to store all the data in database.
 ## Directory Structure
 
 <pre>
-project                                      scrapy module dirs
+project                                   scrapy module dirs
 ├── CHIIA
 │   ├── __init__.py
 │   ├── chromedriver                      headless chrome driver for whole platforms
