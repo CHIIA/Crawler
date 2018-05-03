@@ -24,9 +24,10 @@ class FectivaSpider(scrapy.Spider):
     def start_requests(self):
         post_data = "ftx=Australia"
         search_url = 'https://global-factiva-com.virtual.anu.edu.au/ha/default.aspx'
-        body = "ftx=Chin* AND Australia AND invest*"
+        ftx = 'ftx=((chin* or hong kong)) and (( (residential or site or commercial) and (casino resort or island or hotel or apartment or park or estate or property) and (group or firm or company or board or entitys) and (transaction* or purchase* or sale or sold or buy) ) or ( (uranium or wind or gold or solar or ore or copper or energy or alumina or iron or lead or coal or oil) and (bonds or acquisition or merge or purchase or sale or stake or equity) and (million* or billion* or B or M) and (operations or mining or firm or company)) or ( (dairy or cheese or butter or milk or bread or wine) and (sold or buy or sale or equity or stake or merge or acquire) and (brand or company or business or group or firm or board) and (million* or billion* or B or M))) not (terrorism or war or navy or stock market or share market or Wall St or Wall Street or Forex or Stock Exchange or rst=asxtex) and re=austr'
+        dr = ['LastDay','LastWeek','Last3Months','Last6Months','LastYear','Last2Year','Last5Year']
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
-        yield FormRequest(url=search_url,formdata={'ftx': 'Chin* AND Australia AND invest*'},
+        yield FormRequest(url=search_url,formdata={'ftx': ftx, 'dr':dr},
                           callback=self.parse_search)
 
     def parse_redirect(self,response):
@@ -38,6 +39,7 @@ class FectivaSpider(scrapy.Spider):
         with open(filename, 'wb') as f:
             f.write(response.body)
         '''
+        
         key=re.search(r'doLinkPost\(\".*\,\"(.*)\"\,\"(.*)"\)',response.body.decode('utf-8'))
         xformstate = key.group(1)
         xformsesstate = key.group(2)
