@@ -13,7 +13,7 @@ BOT_NAME = 'CHIIA'
 
 SPIDER_MODULES = ['CHIIA.spiders']
 NEWSPIDER_MODULE = 'CHIIA.spiders'
-
+LOG_FILE = './log.txt'
 #Maxim proxy using in proxy pool
 #MAX_PROXY_USING = -1
 
@@ -24,7 +24,7 @@ NEWSPIDER_MODULE = 'CHIIA.spiders'
 ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-CONCURRENT_REQUESTS = 10
+CONCURRENT_REQUESTS = 4
 
 # Configure a delay for requests for the same website (default: 0)
 # See http://scrapy.readthedocs.org/en/latest/topics/settings.html#download-delay
@@ -69,11 +69,12 @@ DOWNLOAD_TIMEOUT = 200
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'CHIIA.pipelines.MongoDBPipleline': 401,
+    #'CHIIA.pipelines.MongoDBPipleline': 401,
+    'CHIIA.pipelines.WebcrawlerScrapyPipeline':402
 #'CHIIA.pipelines.PDFPipeline': 400,
 
 }
-FILES_STORE = './articles'
+FILES_STORE = '/var/www/chiia-nlp/public/article'
 #MEDIA_ALLOW_REDIRECTS = True
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See http://doc.scrapy.org/en/latest/topics/autothrottle.html
@@ -95,3 +96,10 @@ FILES_STORE = './articles'
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+#Mysql数据库的配置信息
+MYSQL_HOST = '127.0.0.1'
+MYSQL_DBNAME = 'NLP'         #数据库名字，请修改
+MYSQL_USER = 'root'             #数据库账号，请修改
+MYSQL_PASSWD = 'lygame218'         #数据库密码，请修改
+MYSQL_PORT = 3306               #数据库端口，在dbhelper中使用
+

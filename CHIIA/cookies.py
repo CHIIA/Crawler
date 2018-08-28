@@ -22,12 +22,14 @@ logging.getLogger("selenium").setLevel(logging.CRITICAL)  # 将selenium的日志
 COOKIE_GETWAY = 'OUTSIDE'
 
 anuID=[
-       {'id':'u6274652','psw':'ly_game218'},
+       {'id':'u6274652','psw':'ly_game219'},
        ]
 
 #Check Platform to load chromedriver
 if os.name == 'nt':
     chrome_driver = os.getcwd() +"/chromedriver/win_chromedriver.exe"
+elif os.name == 'posix':
+    chrome_driver = os.getcwd() +"/chromedriver/linux_chromedriver"
 else:
     chrome_driver = os.getcwd() +"/chromedriver/mac_chromedriver"
 

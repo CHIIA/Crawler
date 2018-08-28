@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
 from datetime import datetime as dt
+import time
 from dateutil.parser import parse
 from scrapy.http import Request
 from scrapy.http import FormRequest
@@ -10,7 +11,10 @@ from CHIIA.items import ArticleItem,PDFItem
 import logging
 #html to pdf
 import pdfkit
-#from CHIIA.cookies import cookie
+import weasyprint
+from scrapy.utils.project import get_project_settings
+from xhtml2pdf import pisa
+from CHIIA.cookies import cookie
 
 
 logger = logging.getLogger(__name__)
@@ -32,9 +36,21 @@ def isDate(input):
 class FectivaSpider(scrapy.Spider):
     name = 'fectiva'
     allowed_domains = ['factiva.com','virtual.anu.edu.au']
+    settings = get_project_settings()
     page = 0
     #i=0
     
+    # Utility function
+    def convertHtmlToPdf(self,sourceHtml, outputFitimelename):
+        # open output file for writing (truncated binary)
+        resultFile = open(outputFilename, "w+b")
+
+        # convert HTML to PDF
+        pisaStatus = pisa.CreatePDF(sourceHtml, dest=resultFile) # file handle to recieve result
+        # close output file
+        resultFile.close()                 # close output file
+        # return True on success and False on errors
+        return pisaStatus.err
 
     def start_requests(self):
         post_data = "ftx=Australia"
@@ -48,7 +64,7 @@ class FectivaSpider(scrapy.Spider):
 
     def parse_redirect(self,response):
         #self.i+=1
-        redirect_url = 'https://global-factiva-com.virtual.anu.edu.au/ga/default.aspx'
+        redirect_url = 'https://global-factiva-comtime.virtual.anu.edu.au/ga/default.aspx'
         
         #print('meta::',response.meta)
         
@@ -58,14 +74,18 @@ class FectivaSpider(scrapy.Spider):
         #articleitems['Text'] =str(soup.find("div","article"))
         articleitems['PostDate'] = response.meta['Date']
         articleitems['CrawlDate'] = dt.today().strftime('%Y-%m-%d')
-        articleitems['Class'] = 'UNK'
+        articleitems['Url'] =  response.request.url
+        articleitems['Path'] = '{}.pdf'.format(response.meta['_id'])
+        articleitems['Author'] = response.meta['Author']
+        print('[Important] article get from page:',response.meta['Page'])
+        logger.info('[Important] article get from page:{}'.format(response.meta['Page']))
         yield articleitems
-        
+        '''
         filename = 'title-id.txt'
         with open(filename, 'a') as f:
             line = '{} - {}\n'.format(articleitems['_id'],articleitems['Title'])
             f.write(line)
-        
+        '''
         
         key=re.search(r'doLinkPost\(\".*\,\"(.*)\"\,\"(.*)"\)',response.body.decode('utf-8'))
         if key:
@@ -73,12 +93,29 @@ class FectivaSpider(scrapy.Spider):
             xformsesstate = key.group(2)
             yield FormRequest(url=redirect_url,formdata={'_XFORMSTATE':xformstate ,'_XFORMSESSSTATE':xformsesstate},callback=self.parse_article)
         else:
-            
+            options = {
+                'page-size': 'Letter',
+                'margin-top': '0.75in',
+                'margin-right': '0.75in',
+                'margin-bottom': '0.75in',
+                'margin-left': '0.75in',
+                'encoding': "UTF-8",
+		'load-error-handling': 'ignore',
+                'quiet': '',
+		'no-print-media-type':'',
+		
+            }
+            config = pdfkit.configuration(wkhtmltopdf = '/usr/bin/wkhtmltopdf')
             #logger.info('Try to get PDF from: {}'.format(response.meta['redirect_urls']))
             #options = {'cookie': cookie}
             #pdfkit.from_url(response.body,'./articles/{}.pdf'.format(articleitems['_id']))
-            pdfkit.from_string(response.body.decode('utf-8'),'./articles/{}.pdf'.format(articleitems['_id']))
-
+            try:
+            	logger.info('save html To {}/{}.pdf'.format(self.settings['FILES_STORE'],articleitems['_id']))
+            	pdfkit.from_string(response.body.decode('utf-8'),'{}/{}.pdf'.format(self.settings['FILES_STORE'],articleitems['_id']),options = options)
+            except:
+            	logger.info('wkhtml error')
+            #weasyprint.HTML(string=response.body.decode('utf-8')).write_pdf('./articles/{}.pdf'.format(articleitems['_id']))
+            #self.convertHtmlToPdf(response.body.decode('utf-8'),'{}/{}.pdf'.format(self.settings['FILES_STORE'],articleitems['_id']))
     def parse_article(self,response):
         content = response.body.decode('utf-8')
         soup = BeautifulSoup(content,"html.parser")
@@ -120,14 +157,13 @@ class FectivaSpider(scrapy.Spider):
         '''
     
     def save_PDFfile(self,response):
-        print(response.meta['filename'])
+        #print(response.meta['filename'])
        
         filename = str(response.meta['filename'])
-        print(filename)
-        logger.info('save pdf!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+        logger.info('[save pdf] filename: {}'.format(filename))
         buf = BytesIO(response.body)
         buf.seek(0)
-        path = 'articles/{}.pdf'.format(filename)
+        path = '{}/{}.pdf'.format(self.settings['FILES_STORE'],filename)
         with open(path, 'wb') as f:
             f.write(buf.getvalue())
 
@@ -151,12 +187,18 @@ class FectivaSpider(scrapy.Spider):
         while 1:
             print('save a sample')
         '''
-        
+        if 'Page' in response.meta:#update session state
+            print('[Important] page',response.meta['Page'])
+            #logger.info('[Important] Response from page: {}'.format(response.meta['Page']))
         soup = BeautifulSoup(response.body.decode('utf-8'),"html.parser")
         
         for item, description in zip(soup.find_all("a","enHeadline"),soup.find_all("div","leadFields")):
             description = description.text.split(',')
             info = dict()
+            if 'Page' in response.meta:
+                info['Page'] = response.meta['Page']
+            else:
+                info['Page'] = 0
             info['Title'] = item.text
             info['Author'] = description[0]
             if isDate(description[2]):
@@ -164,18 +206,21 @@ class FectivaSpider(scrapy.Spider):
             else:
                 info['Date'] = parse(description[1]).strftime('%Y-%m-%d')
             info['Articles_url']='https://global-factiva-com.virtual.anu.edu.au' + item.get('href')[2:]
-            print('kkk',info['Articles_url'])
             match = re.search(r'accessionno=(.*)&fcpil',info['Articles_url'])
             if match:
                 info['_id'] = match.group(1)
             
             #print('Title: {}\nURL: {}\n'.format(title,articles_url))
-            
-            
+            if 'Page' in response.meta:            
+                print('[Request] request article from search page:',info['Page'])
             yield Request(url=info['Articles_url'], callback=self.parse_redirect, meta = info, dont_filter=True)
         for item, description in zip(soup.find_all("a","\\\"enHeadline\\\""),soup.find_all("div","\\\"leadFields\\\"")):
             description = description.text.split(',')
             info = dict()
+            if 'Page' in response.meta:
+                info['Page'] = response.meta['Page']
+            else:
+                info['Page'] = 0
             info['Title'] = item.text
             info['Author'] = description[0]
             if isDate(description[2]):
@@ -184,19 +229,22 @@ class FectivaSpider(scrapy.Spider):
                 info['Date'] = parse(description[1]).strftime('%Y-%m-%d')
                                      
             info['Articles_url']= 'https://global-factiva-com.virtual.anu.edu.au' + item.get('href')[4:]
-            print('uuu',info['Articles_url'])
             match = re.search(r'accessionno=(.*)&fcpil',info['Articles_url'])
             if match:
                 info['_id'] = match.group(1)
-            
+            if 'Page' in response.meta:            
+                print('[Request] request article from search page:',info['Page'])
             yield Request(url=info['Articles_url'], callback=self.parse_redirect, meta = info, dont_filter=True)
+        '''
         #find next_page start number
         find = re.search(r'viewNext.*viewNext\(\'(\d*)\'\);',response.body.decode('utf-8'))
         if find != None:
             next_page = find.group(1)
-        else:
+        else if re.search(r'viewNext\(\'(\d*)\'\);',response.body.decode('utf-8')).group(1):
             next_page = re.search(r'viewNext\(\'(\d*)\'\);',response.body.decode('utf-8')).group(1)
-
+        
+        logger.info('Current crawling page: {}'.format(next_page))
+        '''
         #find xformstate and xformsesstate
         xformstate,xformsesstate = self.get_formbody(response.body.decode('utf-8'))
         if xformstate and xformsesstate != None:#update session state
@@ -207,11 +255,14 @@ class FectivaSpider(scrapy.Spider):
        
        
        
-   
-        self.page += 1
-        print('crawl page:{}'.format(self.page))
-        yield FormRequest(url=page_url,formdata={'_XFORMSTATE': self.xformstate ,
-                          '_XFORMSESSSTATE': self.xformsesstate,
-                          'hs': str(self.page * 100),
-                          'serviceType': 'factiva.com.ui.services.SearchResultsService'},
-                          callback=self.parse_search)
+        if self.page ==0:
+            for x in range(1,2000):
+                time.sleep(10)
+                self.page += 1
+                logger.info('yield page {} request'.format(self.page))
+                yield FormRequest(url=page_url,formdata={'_XFORMSTATE': self.xformstate ,
+                                  '_XFORMSESSSTATE': self.xformsesstate,
+                                  'hs': str(self.page * 100),
+                                  'serviceType': 'factiva.com.ui.services.SearchResultsService'},
+                                  meta = {'Page':self.page},
+                                  callback=self.parse_search)

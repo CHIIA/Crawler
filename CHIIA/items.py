@@ -15,8 +15,10 @@ class ArticleItem(Item):
     Text = Field()
     PostDate = Field()
     CrawlDate = Field()
-    Class = Field()
-
+    Class = Field() 
+    Path = Field()
+    Url = Field()
+    Author = Field()
 class PDFItem(Item):
     """ Article structure """
     _id = Field()
