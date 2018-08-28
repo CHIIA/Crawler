@@ -2,7 +2,7 @@
 
 import os
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -20,6 +20,15 @@ logger = logging.getLogger(__name__)
 logging.getLogger("selenium").setLevel(logging.CRITICAL)  # 将selenium的日志级别设成DEBUG，太烦人
 
 COOKIE_GETWAY = 'OUTSIDE'
+BROWSER_TYPE = 'FIREFOX'
+
+if BROWSER_TYPE == 'FIREFOX':
+    print('Using headless firefox ...')
+    from selenium.webdriver.firefox.options import Options 
+elif BROWSER_TYPE == 'CHROME':
+    from selenium.webdriver.chrome.options import Options
+    print('Using headless chrome ...') 
+
 
 anuID=[
        {'id':'u6274652','psw':'ly_game219'},
@@ -32,6 +41,8 @@ elif os.name == 'posix':
     chrome_driver = os.getcwd() +"/chromedriver/linux_chromedriver"
 else:
     chrome_driver = os.getcwd() +"/chromedriver/mac_chromedriver"
+
+firefox_driver = os.getcwd() + "/firefoxdriver/geckodriver_linux"
 
 def get_cookie_without_login():
     #login by using headless chrome
@@ -71,9 +82,8 @@ def get_cookie_without_login():
         return json.dumps(cookies)
 def get_cookie_with_login(account,pwd):
     #login by using headless chrome
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--window-size=1920x1080")
+    options = Options()
+    options.add_argument("--headless")
     
     # download the chrome browser from https://sites.google.com/a/chromium.org/chromebrowser/downloads and put it in the
     # current directory
@@ -82,7 +92,10 @@ def get_cookie_with_login(account,pwd):
     FLAG_LOGIN = False
     while not FLAG_LOGIN:
         try:
-            browser = webdriver.Chrome(chrome_options=chrome_options, executable_path=chrome_driver)
+            if BROWSER_TYPE == 'FIREFOX':
+                browser = webdriver.Firefox(firefox_options=options, executable_path=firefox_driver)
+            elif BROWSER_TYPE == 'CHROME':
+	        browser = webdriver.Chrome(chrome_options=options, executable_path=chrome_driver)
             browser.get("http://library-admin.anu.edu.au/tools/factiva-redirect")
             wait = WebDriverWait(browser, 5)
             anuID = wait.until(EC.presence_of_element_located((By.ID, 'requester')))
@@ -96,8 +109,8 @@ def get_cookie_with_login(account,pwd):
             browser.get_screenshot_as_file("logs/login.png")
             btn = wait.until(EC.presence_of_element_located((By.ID, 'btnSearchBottom')))
             #swith from smart search to fix search
-            switch = browser.find_element_by_id("switchbutton")
-            switch.click()
+            #switch = browser.find_element_by_id("switchbutton")
+            #switch.click()
             input = browser.find_element_by_id('ftx')
             input.send_keys('Chin* AND Australia AND invest*')
             search_button = browser.find_element_by_id('btnSearchBottom')
@@ -139,6 +152,7 @@ def getCookies():
     logger.info("Get cookie...")
     cookies = []
     if COOKIE_GETWAY == 'ANU':
+	print('ANU cases')
         cookie = get_cookie_without_login()
         cookies.append(cookie)
     elif COOKIE_GETWAY =='OUTSIDE':

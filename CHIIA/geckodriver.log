@@ -1,0 +1,105 @@
+1535468244681	geckodriver	INFO	geckodriver 0.21.0
+1535468244684	geckodriver	INFO	Listening on 127.0.0.1:48237
+1535468245689	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.3ZTQ6Srpit9U"
+1535468247069	Marionette	INFO	Listening on port 38431
+1535468247098	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript error: http://s1.bdstatic.com/r/www/cache/static/plugins/every_cookie_4644b13.js, line 4: ReferenceError: c is not defined
+[Parent 16421, Gecko_IOThread] WARNING: pipe error (59): Connection reset by peer: file /build/firefox-mWstsA/firefox-61.0.1+build1/ipc/chromium/src/chrome/common/ipc_channel_posix.cc, line 353
+*** UTM:SVC TimerManager:registerTimer called after profile-before-change notification. Ignoring timer registration for id: telemetry_modules_ping
+1535468430230	geckodriver	INFO	geckodriver 0.21.0
+1535468430233	geckodriver	INFO	Listening on 127.0.0.1:41667
+1535468431240	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.2axfNSZxESnf"
+*** You are running in headless mode.
+1535468432561	Marionette	INFO	Listening on port 46703
+1535468432680	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript error: http://s1.bdstatic.com/r/www/cache/static/plugins/every_cookie_4644b13.js, line 4: ReferenceError: c is not defined
+*** UTM:SVC TimerManager:registerTimer called after profile-before-change notification. Ignoring timer registration for id: telemetry_modules_ping
+1535469457080	geckodriver	INFO	geckodriver 0.21.0
+1535469457083	geckodriver	INFO	Listening on 127.0.0.1:53487
+1535469458090	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "--headless" "--screenshot" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.Ug27sgpDzEe4"
+*** You are running in headless mode.
+1535469533875	geckodriver	INFO	geckodriver 0.21.0
+1535469533878	geckodriver	INFO	Listening on 127.0.0.1:46921
+1535469534885	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-headless" "-screenshot" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.XKLUenz2Y6Ny"
+*** You are running in headless mode.
+1535469663336	geckodriver	INFO	geckodriver 0.21.0
+1535469663340	geckodriver	INFO	Listening on 127.0.0.1:35559
+1535469664346	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-screenshot" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.b81z1i0cN5xU"
+*** You are running in headless mode.
+1535469749734	geckodriver	INFO	geckodriver 0.21.0
+1535469749737	geckodriver	INFO	Listening on 127.0.0.1:42047
+1535469750737	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.rDojFrzBFs75"
+1535469752120	Marionette	INFO	Listening on port 32913
+1535469752146	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript error: http://s1.bdstatic.com/r/www/cache/static/plugins/every_cookie_4644b13.js, line 4: ReferenceError: c is not defined
+[Parent 17890, Gecko_IOThread] WARNING: pipe error (59): Connection reset by peer: file /build/firefox-mWstsA/firefox-61.0.1+build1/ipc/chromium/src/chrome/common/ipc_channel_posix.cc, line 353
+*** UTM:SVC TimerManager:registerTimer called after profile-before-change notification. Ignoring timer registration for id: telemetry_modules_ping
+1535470019809	geckodriver	INFO	geckodriver 0.21.0
+1535470019812	geckodriver	INFO	Listening on 127.0.0.1:55135
+1535470020811	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.CgzXNSBiSlQU"
+1535470022191	Marionette	INFO	Listening on port 42151
+1535470022218	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript error: http://s1.bdstatic.com/r/www/cache/static/plugins/every_cookie_4644b13.js, line 4: ReferenceError: c is not defined
+[Parent 18210, Gecko_IOThread] WARNING: pipe error (53): Connection reset by peer: file /build/firefox-mWstsA/firefox-61.0.1+build1/ipc/chromium/src/chrome/common/ipc_channel_posix.cc, line 353
+*** UTM:SVC TimerManager:registerTimer called after profile-before-change notification. Ignoring timer registration for id: telemetry_modules_ping
+1535470032442	geckodriver	INFO	geckodriver 0.21.0
+1535470032445	geckodriver	INFO	Listening on 127.0.0.1:48279
+1535470033452	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-screenshot" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.5FAnZdSFRByE"
+*** You are running in headless mode.
+1535470196022	geckodriver	INFO	geckodriver 0.21.0
+1535470196026	geckodriver	INFO	Listening on 127.0.0.1:39397
+1535470197033	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-screenshot" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.WdrohuX2swlZ"
+*** You are running in headless mode.
+1535470294041	geckodriver	INFO	geckodriver 0.21.0
+1535470294044	geckodriver	INFO	Listening on 127.0.0.1:53023
+1535470295044	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.d4HiwPp78pZg"
+*** You are running in headless mode.
+1535470296369	Marionette	INFO	Listening on port 34549
+1535470296451	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript error: http://s1.bdstatic.com/r/www/cache/static/plugins/every_cookie_4644b13.js, line 4: ReferenceError: c is not defined
+*** UTM:SVC TimerManager:registerTimer called after profile-before-change notification. Ignoring timer registration for id: telemetry_modules_ping
+1535471747797	geckodriver	INFO	geckodriver 0.21.0
+1535471747800	geckodriver	INFO	Listening on 127.0.0.1:55781
+1535471748800	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.xCriyuAYmmGZ"
+*** You are running in headless mode.
+1535471750188	Marionette	INFO	Listening on port 40637
+1535471750208	Marionette	WARN	TLS certificate errors will be ignored for this session
+
+(/usr/lib/firefox/firefox:20347): dconf-WARNING **: Unable to open /var/lib/snapd/desktop/dconf/profile/user: Permission denied
+JavaScript error: https://global-factiva-com.virtual.anu.edu.au/controls/search/assisted.search0180700ui4sr.ashx, line 1: NS_ERROR_NOT_INITIALIZED: 
+*** UTM:SVC TimerManager:registerTimer called after profile-before-change notification. Ignoring timer registration for id: telemetry_modules_ping
+1535471791721	geckodriver	INFO	geckodriver 0.21.0
+1535471791725	geckodriver	INFO	Listening on 127.0.0.1:46153
+1535471792725	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.b3aR6Wb2Y7fT"
+*** You are running in headless mode.
+1535471794151	Marionette	INFO	Listening on port 33775
+1535471794262	Marionette	WARN	TLS certificate errors will be ignored for this session
+
+(/usr/lib/firefox/firefox:20590): dconf-WARNING **: Unable to open /var/lib/snapd/desktop/dconf/profile/user: Permission denied
+1535471837291	geckodriver	INFO	geckodriver 0.21.0
+1535471837294	geckodriver	INFO	Listening on 127.0.0.1:60733
+1535471838300	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.1hK0UkD6SM0M"
+*** You are running in headless mode.
+1535471839624	Marionette	INFO	Listening on port 46645
+1535471839714	Marionette	WARN	TLS certificate errors will be ignored for this session
+
+(/usr/lib/firefox/firefox:20862): dconf-WARNING **: Unable to open /var/lib/snapd/desktop/dconf/profile/user: Permission denied
+1535471883162	geckodriver	INFO	geckodriver 0.21.0
+1535471883166	geckodriver	INFO	Listening on 127.0.0.1:40303
+1535471884172	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.AU10n4AinBIm"
+*** You are running in headless mode.
+1535471885529	Marionette	INFO	Listening on port 45933
+1535471885578	Marionette	WARN	TLS certificate errors will be ignored for this session
+
+(/usr/lib/firefox/firefox:21157): dconf-WARNING **: Unable to open /var/lib/snapd/desktop/dconf/profile/user: Permission denied
+1535472461593	geckodriver	INFO	geckodriver 0.21.0
+1535472461596	geckodriver	INFO	Listening on 127.0.0.1:49523
+1535472462603	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.HrM1rKAeLPgu"
+*** You are running in headless mode.
+1535472464023	Marionette	INFO	Listening on port 41371
+1535472464174	Marionette	WARN	TLS certificate errors will be ignored for this session
+
+(/usr/lib/firefox/firefox:21682): dconf-WARNING **: Unable to open /var/lib/snapd/desktop/dconf/profile/user: Permission denied
+JavaScript error: https://global-factiva-com.virtual.anu.edu.au/sb/default.aspx?lnep=hp, line 272: ReferenceError: AjaxControlToolkit is not defined
+[Parent 21584, Gecko_IOThread] WARNING: pipe error (50): Connection reset by peer: file /build/firefox-mWstsA/firefox-61.0.1+build1/ipc/chromium/src/chrome/common/ipc_channel_posix.cc, line 353
+*** UTM:SVC TimerManager:registerTimer called after profile-before-change notification. Ignoring timer registration for id: telemetry_modules_ping

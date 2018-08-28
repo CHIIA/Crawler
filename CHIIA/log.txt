@@ -3574,3 +3574,139 @@ ValueError: ('Unknown string format:', ' Country Risk & Financial Markets Daily 
 2018-08-08 06:57:40 [scrapy.core.engine] DEBUG: Crawled (200) <POST https://global-factiva-com.virtual.anu.edu.au/services/ajaxservice.aspx> (referer: https://global-factiva-com.virtual.anu.edu.au/ha/default.aspx) ['partial']
 2018-08-08 06:57:41 [scrapy.crawler] INFO: Received SIG_SETMASK twice, forcing unclean shutdown
 2018-08-08 06:57:41 [scrapy.downloadermiddlewares.retry] DEBUG: Retrying <POST https://global-factiva-com.virtual.anu.edu.au/services/ajaxservice.aspx> (failed 1 times): [<twisted.python.failure.Failure twisted.internet.error.ConnectionLost: Connection to the other side was lost in a non-clean fashion: Connection lost.>]
+2018-08-28 20:46:14 [scrapy.utils.log] INFO: Scrapy 1.5.0 started (bot: CHIIA)
+2018-08-28 20:46:14 [scrapy.utils.log] INFO: Versions: lxml 4.1.1.0, libxml2 2.9.7, cssselect 1.0.3, parsel 1.4.0, w3lib 1.19.0, Twisted 18.4.0, Python 2.7.14 |Anaconda, Inc.| (default, Dec  7 2017, 17:05:42) - [GCC 7.2.0], pyOpenSSL 17.5.0 (OpenSSL 1.0.2n  7 Dec 2017), cryptography 2.1.4, Platform Linux-4.15.0-30-generic-x86_64-with-debian-stretch-sid
+2018-08-28 20:46:14 [scrapy.crawler] INFO: Overridden settings: {'NEWSPIDER_MODULE': 'CHIIA.spiders', 'CONCURRENT_REQUESTS': 4, 'SPIDER_LOADER_WARN_ONLY': True, 'SPIDER_MODULES': ['CHIIA.spiders'], 'BOT_NAME': 'CHIIA', 'DOWNLOAD_TIMEOUT': 200, 'LOG_FILE': './log.txt', 'DOWNLOAD_DELAY': 1}
+2018-08-28 20:46:14 [scrapy.middleware] INFO: Enabled extensions:
+['scrapy.extensions.memusage.MemoryUsage',
+ 'scrapy.extensions.logstats.LogStats',
+ 'scrapy.extensions.telnet.TelnetConsole',
+ 'scrapy.extensions.corestats.CoreStats']
+2018-08-28 20:46:14 [scrapy.middleware] INFO: Enabled downloader middlewares:
+['scrapy.downloadermiddlewares.httpauth.HttpAuthMiddleware',
+ 'CHIIA.middlewares.UserAgentMiddleware',
+ 'CHIIA.middlewares.CookiesMiddleware',
+ 'scrapy.downloadermiddlewares.downloadtimeout.DownloadTimeoutMiddleware',
+ 'scrapy.downloadermiddlewares.defaultheaders.DefaultHeadersMiddleware',
+ 'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware',
+ 'scrapy.downloadermiddlewares.retry.RetryMiddleware',
+ 'scrapy.downloadermiddlewares.redirect.MetaRefreshMiddleware',
+ 'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware',
+ 'scrapy.downloadermiddlewares.redirect.RedirectMiddleware',
+ 'scrapy.downloadermiddlewares.cookies.CookiesMiddleware',
+ 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware',
+ 'scrapy.downloadermiddlewares.stats.DownloaderStats']
+2018-08-28 20:46:14 [scrapy.middleware] INFO: Enabled spider middlewares:
+['scrapy.spidermiddlewares.httperror.HttpErrorMiddleware',
+ 'scrapy.spidermiddlewares.offsite.OffsiteMiddleware',
+ 'scrapy.spidermiddlewares.referer.RefererMiddleware',
+ 'scrapy.spidermiddlewares.urllength.UrlLengthMiddleware',
+ 'scrapy.spidermiddlewares.depth.DepthMiddleware']
+2018-08-28 20:46:14 [scrapy.middleware] INFO: Enabled item pipelines:
+['CHIIA.pipelines.WebcrawlerScrapyPipeline']
+2018-08-28 20:46:14 [scrapy.core.engine] INFO: Spider opened
+2018-08-28 20:46:14 [scrapy.extensions.logstats] INFO: Crawled 0 pages (at 0 pages/min), scraped 0 items (at 0 items/min)
+2018-08-28 20:46:14 [scrapy.extensions.telnet] DEBUG: Telnet console listening on 127.0.0.1:6023
+2018-08-28 20:46:23 [scrapy.core.engine] DEBUG: Crawled (200) <POST https://global-factiva-com.virtual.anu.edu.au/ha/default.aspx> (referer: None) ['partial']
+2018-08-28 20:46:33 [fectiva] INFO: yield page 1 request
+2018-08-28 20:46:43 [fectiva] INFO: yield page 2 request
+2018-08-28 20:46:53 [fectiva] INFO: yield page 3 request
+2018-08-28 20:47:03 [fectiva] INFO: yield page 4 request
+2018-08-28 20:47:04 [scrapy.crawler] INFO: Received SIGINT, shutting down gracefully. Send again to force 
+2018-08-28 20:47:04 [fectiva] INFO: yield page 5 request
+2018-08-28 20:47:04 [scrapy.core.engine] INFO: Closing spider (shutdown)
+2018-08-28 20:47:05 [scrapy.crawler] INFO: Received SIGINT twice, forcing unclean shutdown
+2018-08-28 20:47:05 [fectiva] INFO: yield page 6 request
+2018-08-28 20:47:15 [fectiva] INFO: yield page 7 request
+2018-08-28 20:47:15 [scrapy.downloadermiddlewares.retry] DEBUG: Retrying <GET https://global-factiva-com.virtual.anu.edu.au/du/article.aspx/?accessionno=AFNR000020180826ee8r0001p&fcpil=en&napc=9&sa_from=&cat=a> (failed 1 times): [<twisted.python.failure.Failure OpenSSL.SSL.Error: [('SSL routines', 'ssl3_read_bytes', 'ssl handshake failure')]>]
+2018-08-28 20:47:15 [scrapy.downloadermiddlewares.retry] DEBUG: Retrying <GET https://global-factiva-com.virtual.anu.edu.au/du/article.aspx/?accessionno=NLGCSU0020180827ee8t0002y&fcpil=en&napc=9&sa_from=&cat=a> (failed 1 times): [<twisted.python.failure.Failure twisted.internet.error.ConnectionLost: Connection to the other side was lost in a non-clean fashion: Connection lost.>]
+2018-08-28 20:47:15 [scrapy.downloadermiddlewares.retry] DEBUG: Retrying <GET https://global-factiva-com.virtual.anu.edu.au/du/article.aspx/?accessionno=WC72982020180826ee8q00007&fcpil=en&napc=9&sa_from=&cat=w%20> (failed 1 times): [<twisted.python.failure.Failure OpenSSL.SSL.Error: [('SSL routines', 'ssl3_read_bytes', 'ssl handshake failure')]>]
+2018-08-28 20:47:15 [scrapy.downloadermiddlewares.retry] DEBUG: Retrying <GET https://global-factiva-com.virtual.anu.edu.au/du/article.aspx/?accessionno=AFNR000020180826ee8r0001r&fcpil=en&napc=9&sa_from=&cat=a> (failed 1 times): [<twisted.python.failure.Failure OpenSSL.SSL.Error: [('SSL routines', 'ssl23_read', 'ssl handshake failure')]>]
+2018-08-29 02:08:40 [scrapy.utils.log] INFO: Scrapy 1.5.0 started (bot: CHIIA)
+2018-08-29 02:08:40 [scrapy.utils.log] INFO: Versions: lxml 4.1.1.0, libxml2 2.9.7, cssselect 1.0.3, parsel 1.4.0, w3lib 1.19.0, Twisted 18.4.0, Python 2.7.14 |Anaconda, Inc.| (default, Dec  7 2017, 17:05:42) - [GCC 7.2.0], pyOpenSSL 17.5.0 (OpenSSL 1.0.2n  7 Dec 2017), cryptography 2.1.4, Platform Linux-4.15.0-30-generic-x86_64-with-debian-stretch-sid
+2018-08-29 02:08:40 [scrapy.crawler] INFO: Overridden settings: {'NEWSPIDER_MODULE': 'CHIIA.spiders', 'CONCURRENT_REQUESTS': 4, 'SPIDER_LOADER_WARN_ONLY': True, 'SPIDER_MODULES': ['CHIIA.spiders'], 'BOT_NAME': 'CHIIA', 'DOWNLOAD_TIMEOUT': 200, 'LOG_FILE': './log.txt', 'DOWNLOAD_DELAY': 1}
+2018-08-29 02:08:40 [scrapy.middleware] INFO: Enabled extensions:
+['scrapy.extensions.memusage.MemoryUsage',
+ 'scrapy.extensions.logstats.LogStats',
+ 'scrapy.extensions.telnet.TelnetConsole',
+ 'scrapy.extensions.corestats.CoreStats']
+2018-08-29 02:08:41 [scrapy.middleware] INFO: Enabled downloader middlewares:
+['scrapy.downloadermiddlewares.httpauth.HttpAuthMiddleware',
+ 'CHIIA.middlewares.UserAgentMiddleware',
+ 'CHIIA.middlewares.CookiesMiddleware',
+ 'scrapy.downloadermiddlewares.downloadtimeout.DownloadTimeoutMiddleware',
+ 'scrapy.downloadermiddlewares.defaultheaders.DefaultHeadersMiddleware',
+ 'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware',
+ 'scrapy.downloadermiddlewares.retry.RetryMiddleware',
+ 'scrapy.downloadermiddlewares.redirect.MetaRefreshMiddleware',
+ 'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware',
+ 'scrapy.downloadermiddlewares.redirect.RedirectMiddleware',
+ 'scrapy.downloadermiddlewares.cookies.CookiesMiddleware',
+ 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware',
+ 'scrapy.downloadermiddlewares.stats.DownloaderStats']
+2018-08-29 02:08:41 [scrapy.middleware] INFO: Enabled spider middlewares:
+['scrapy.spidermiddlewares.httperror.HttpErrorMiddleware',
+ 'scrapy.spidermiddlewares.offsite.OffsiteMiddleware',
+ 'scrapy.spidermiddlewares.referer.RefererMiddleware',
+ 'scrapy.spidermiddlewares.urllength.UrlLengthMiddleware',
+ 'scrapy.spidermiddlewares.depth.DepthMiddleware']
+2018-08-29 02:08:41 [scrapy.middleware] INFO: Enabled item pipelines:
+['CHIIA.pipelines.WebcrawlerScrapyPipeline']
+2018-08-29 02:08:41 [scrapy.core.engine] INFO: Spider opened
+2018-08-29 02:08:41 [scrapy.extensions.logstats] INFO: Crawled 0 pages (at 0 pages/min), scraped 0 items (at 0 items/min)
+2018-08-29 02:08:41 [scrapy.extensions.telnet] DEBUG: Telnet console listening on 127.0.0.1:6023
+2018-08-29 02:08:48 [scrapy.core.engine] DEBUG: Crawled (200) <POST https://global-factiva-com.virtual.anu.edu.au/ha/default.aspx> (referer: None) ['partial']
+2018-08-29 02:08:59 [fectiva] INFO: yield page 1 request
+2018-08-29 02:09:09 [fectiva] INFO: yield page 2 request
+2018-08-29 02:09:19 [fectiva] INFO: yield page 3 request
+2018-08-29 02:09:29 [fectiva] INFO: yield page 4 request
+2018-08-29 02:09:39 [fectiva] INFO: yield page 5 request
+2018-08-29 02:09:49 [fectiva] INFO: yield page 6 request
+2018-08-29 02:09:49 [scrapy.extensions.logstats] INFO: Crawled 1 pages (at 1 pages/min), scraped 0 items (at 0 items/min)
+2018-08-29 02:09:59 [fectiva] INFO: yield page 7 request
+2018-08-29 02:10:09 [fectiva] INFO: yield page 8 request
+2018-08-29 02:10:09 [scrapy.core.engine] DEBUG: Crawled (200) <GET https://global-factiva-com.virtual.anu.edu.au/du/article.aspx/?accessionno=AFNR000020180828ee8t00022&fcpil=en&napc=9&sa_from=&cat=a> (referer: https://global-factiva-com.virtual.anu.edu.au/ha/default.aspx) ['partial']
+2018-08-29 02:10:19 [fectiva] INFO: yield page 9 request
+2018-08-29 02:10:29 [fectiva] INFO: yield page 10 request
+2018-08-29 02:10:29 [scrapy.core.engine] DEBUG: Crawled (200) <GET https://global-factiva-com.virtual.anu.edu.au/du/article.aspx/?accessionno=LOFILM0020180827ee8r00002&fcpil=en&napc=9&sa_from=&cat=a> (referer: https://global-factiva-com.virtual.anu.edu.au/ha/default.aspx) ['partial']
+2018-08-29 02:10:29 [fectiva] INFO: [Important] article get from page:0
+2018-08-29 02:10:29 [scrapy.core.scraper] DEBUG: Scraped from <200 https://global-factiva-com.virtual.anu.edu.au/du/article.aspx/?accessionno=AFNR000020180828ee8t00022&fcpil=en&napc=9&sa_from=&cat=a>
+{'Author': u'The Australian Financial Review',
+ 'CrawlDate': '2018-08-29',
+ 'Path': 'AFNR000020180828ee8t00022.pdf',
+ 'PostDate': '2018-08-29',
+ 'Title': u' Stellar showing for Steller as it steers through $232m settlements',
+ 'Url': 'https://global-factiva-com.virtual.anu.edu.au/du/article.aspx/?accessionno=AFNR000020180828ee8t00022&fcpil=en&napc=9&sa_from=&cat=a',
+ '_id': u'AFNR000020180828ee8t00022'}
+2018-08-29 02:10:39 [fectiva] INFO: yield page 11 request
+2018-08-29 02:10:39 [scrapy.core.engine] DEBUG: Crawled (200) <GET https://global-factiva-com.virtual.anu.edu.au/du/article.aspx/?accessionno=AGINV00020180827ee8r00001&fcpil=en&napc=9&sa_from=&cat=a> (referer: https://global-factiva-com.virtual.anu.edu.au/ha/default.aspx) ['partial']
+2018-08-29 02:10:44 [scrapy.crawler] INFO: Received SIGINT, shutting down gracefully. Send again to force 
+2018-08-29 02:10:44 [fectiva] INFO: yield page 12 request
+2018-08-29 02:10:44 [scrapy.core.engine] DEBUG: Crawled (200) <GET https://global-factiva-com.virtual.anu.edu.au/du/article.aspx/?accessionno=INVEST0020180827ee8r00001&fcpil=en&napc=9&sa_from=&cat=a> (referer: https://global-factiva-com.virtual.anu.edu.au/ha/default.aspx) ['partial']
+2018-08-29 02:10:44 [scrapy.core.engine] INFO: Closing spider (shutdown)
+2018-08-29 02:10:44 [fectiva] INFO: [Important] article get from page:0
+2018-08-29 02:10:44 [scrapy.core.scraper] DEBUG: Scraped from <200 https://global-factiva-com.virtual.anu.edu.au/du/article.aspx/?accessionno=LOFILM0020180827ee8r00002&fcpil=en&napc=9&sa_from=&cat=a>
+{'Author': u'LoneWolfFilmsNZ.com',
+ 'CrawlDate': '2018-08-29',
+ 'Path': 'LOFILM0020180827ee8r00002.pdf',
+ 'PostDate': '2018-08-27',
+ 'Title': u' Newsletter: New Zealand Politics Daily \u2013 August 27 2018',
+ 'Url': 'https://global-factiva-com.virtual.anu.edu.au/du/article.aspx/?accessionno=LOFILM0020180827ee8r00002&fcpil=en&napc=9&sa_from=&cat=a',
+ '_id': u'LOFILM0020180827ee8r00002'}
+2018-08-29 02:10:44 [scrapy.extensions.logstats] INFO: Crawled 5 pages (at 4 pages/min), scraped 2 items (at 2 items/min)
+2018-08-29 02:10:44 [scrapy.crawler] INFO: Received SIGINT twice, forcing unclean shutdown
+2018-08-29 02:10:44 [fectiva] INFO: yield page 13 request
+2018-08-29 02:10:44 [fectiva] INFO: [Important] article get from page:0
+2018-08-29 02:10:44 [scrapy.core.scraper] DEBUG: Scraped from <200 https://global-factiva-com.virtual.anu.edu.au/du/article.aspx/?accessionno=AGINV00020180827ee8r00001&fcpil=en&napc=9&sa_from=&cat=a>
+{'Author': u'Agri Investor',
+ 'CrawlDate': '2018-08-29',
+ 'Path': 'AGINV00020180827ee8r00001.pdf',
+ 'PostDate': '2018-08-27',
+ 'Title': u' First State Super secures Victoria land registry in $2.09bn deal',
+ 'Url': 'https://global-factiva-com.virtual.anu.edu.au/du/article.aspx/?accessionno=AGINV00020180827ee8r00001&fcpil=en&napc=9&sa_from=&cat=a',
+ '_id': u'AGINV00020180827ee8r00001'}
+2018-08-29 02:10:54 [fectiva] INFO: yield page 14 request
+2018-08-29 02:10:54 [scrapy.downloadermiddlewares.retry] DEBUG: Retrying <POST https://global-factiva-com.virtual.anu.edu.au/services/ajaxservice.aspx> (failed 1 times): [<twisted.python.failure.Failure OpenSSL.SSL.Error: [('SSL routines', 'ssl23_read', 'ssl handshake failure')]>]
+2018-08-29 02:10:54 [scrapy.downloadermiddlewares.retry] DEBUG: Retrying <POST https://global-factiva-comtime.virtual.anu.edu.au/ga/default.aspx> (failed 1 times): An error occurred while connecting: [Failure instance: Traceback (failure with no frames): <class 'twisted.internet.error.ConnectionLost'>: Connection to the other side was lost in a non-clean fashion: Connection lost.
+].
+2018-08-29 02:10:54 [scrapy.downloadermiddlewares.retry] DEBUG: Retrying <POST https://global-factiva-com.virtual.anu.edu.au/services/ajaxservice.aspx> (failed 1 times): [<twisted.python.failure.Failure OpenSSL.SSL.Error: [('SSL routines', 'ssl3_read_bytes', 'ssl handshake failure')]>]
