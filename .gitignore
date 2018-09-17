@@ -3,6 +3,7 @@ crawler/CHIIA/logs
 crawler/CHIIA/articles
 crawler/CHIIA/database
 crawler/CHIIA/articles
+headless/data
 __pycache__
 *.html
 *.jpg
