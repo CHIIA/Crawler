@@ -1,0 +1,8 @@
+1535471415862	geckodriver	INFO	geckodriver 0.21.0
+1535471415866	geckodriver	INFO	Listening on 127.0.0.1:33655
+1535471416866	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.8IgDYAmQs7tQ"
+*** You are running in headless mode.
+1535471418287	Marionette	INFO	Listening on port 38829
+1535471418458	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript error: http://s1.bdstatic.com/r/www/cache/static/plugins/every_cookie_4644b13.js, line 4: ReferenceError: c is not defined
+*** UTM:SVC TimerManager:registerTimer called after profile-before-change notification. Ignoring timer registration for id: telemetry_modules_ping

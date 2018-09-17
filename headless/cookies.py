@@ -1,0 +1,223 @@
+# encoding=utf-8
+
+import os
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import TimeoutException,NoSuchElementException,ElementNotVisibleException,WebDriverException
+from selenium.webdriver.support.ui import Select
+from time import sleep
+import re
+
+import json
+import logging
+from datetime import datetime
+
+
+
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level = logging.INFO,format = '%(asctime)s - %(levelname)s - %(message)s')#,filename='./logs/{}.log'.format(datetime.now()))
+logging.getLogger("selenium").setLevel(logging.CRITICAL)  # 将selenium的日志级别设成DEBUG，太烦人
+
+formatter = logging.Formatter(
+                              '%(asctime)s - %(name)s - %(levelname)s: - %(message)s',
+                              datefmt='%Y-%m-%d %H:%M:%S')
+
+
+
+anuID=[
+       {'id':'u6274652','psw':'ly_game219'},
+       ]
+
+GATEWAY = 'ANULIB'
+
+queryTerms = '((chin* or hong kong)) and (( (residential or site or commercial) and (casino resort or island or hotel or apartment or park or estate or property) and (group or firm or company or board or entitys) and (transaction* or purchase* or sale or sold or buy) ) or ( (uranium or wind or gold or solar or ore or copper or energy or alumina or iron or lead or coal or oil) and (bonds or acquisition or merge or purchase or sale or stake or equity) and (million* or billion* or B or M) and (operations or mining or firm or company)) or ( (dairy or cheese or butter or milk or bread or wine) and (sold or buy or sale or equity or stake or merge or acquire) and (brand or company or business or group or firm or board) and (million* or billion* or B or M))) not (terrorism or war or navy or stock market or share market or Wall St or Wall Street or Forex or Stock Exchange or rst=asxtex) and re=austr'
+queryPeriod = 'In the last 2 years'
+
+#Check Platform to load chromedriver
+if os.name == 'nt':
+    chrome_driver = os.getcwd() +"/chromedriver/win_chromedriver.exe"
+else:
+    chrome_driver = os.getcwd() +"/chromedriver/mac_chromedriver"
+
+
+#login by using headless chrome
+chrome_options = Options()
+#chrome_options.add_argument("--headless")
+chrome_options.add_argument("--window-size=1920x1080")
+browser = webdriver.Chrome(chrome_options=chrome_options, executable_path=chrome_driver)
+
+
+
+def loginFectiva(browser,account,pwd):
+    FLAG_LOGIN = False
+    while not FLAG_LOGIN:
+        try:
+            
+            browser.get("http://library-admin.anu.edu.au/tools/factiva-redirect")
+            
+            if GATEWAY == 'OUTSIDE':
+                logger.info("Gateway: OUTSIDE")
+                wait = WebDriverWait(browser, 5)
+                anuID = wait.until(EC.presence_of_element_located((By.ID, 'requester')))
+                anuID.send_keys(account)
+                password = browser.find_element_by_id('requesteremail')
+                password.send_keys(pwd)
+                browser.get_screenshot_as_file("logs/pre-login.png")
+                password.send_keys(Keys.RETURN)
+            elif GATEWAY == 'ANULIB':
+                logger.info("Gateway: ANULIB")
+            else:
+                logger.error("Please Set Cookie Gateway!")
+           
+            wait = WebDriverWait(browser, 40)
+            browser.get_screenshot_as_file("logs/login.png")
+            btn = wait.until(EC.presence_of_element_located((By.ID, 'btnSearchBottom')))
+            #swith from smart search to fix search
+            switch = browser.find_element_by_id("switchbutton")
+            switch.click()
+            sleep(1)
+            input = browser.find_element_by_id('ftx')
+            input.send_keys(queryTerms)
+            #select searching date
+            select = Select(browser.find_element_by_name('dr'))
+            #select.select_by_index(index)
+            select.select_by_visible_text(queryPeriod)
+            #select.select_by_value(value)
+            search_button = browser.find_element_by_id('btnSearchBottom')
+            search_button.click()
+            headlineFrame = wait.until(EC.presence_of_element_located((By.ID, 'headlineFrame')))
+            browser.get_screenshot_as_file("logs/search.png")
+            FLAG_LOGIN = True
+        except NoSuchElementException:
+            logger.error('No Element during login')
+            browser.close()
+        except ElementNotVisibleException:
+            logger.error('Not Visible during login')
+            browser.close()
+        except TimeoutException:
+            logger.error('Timeout during login')
+            browser.get_screenshot_as_file("logs/capture.png")
+            #browser.close()
+    list_cookies = browser.get_cookies()
+    cookies=dict()
+    for item in list_cookies:
+        cookies[item['name']] = item['value']
+
+    return json.dumps(cookies)
+
+def getStatus(browser):
+    #Compute the total pages we need to download
+    pageInfo = browser.find_element_by_xpath('//span[@class="resultsBar"]').text.replace(',','')
+    duplicate = browser.find_element_by_id('dedupSummary').text
+    duplicate = int(re.match('Total duplicates: (.*)',duplicate).group(1))
+    currentPage = int(int(re.search(r'Headlines (.*) - (.*) of (.*)',pageInfo).group(1))/100)
+    totalPages = int((int(re.search(r'Headlines (.*) - (.*) of (.*)',pageInfo).group(3)) - duplicate)/100)-1
+    nextPageStart = int(re.search(r'Headlines (.*) - (.*) of (.*)',pageInfo).group(2))+1
+    totalArticles = browser.find_element_by_xpath('//span[@data-channel="All"][1]/a/span[@class="hitsCount"]').text.replace(',','')
+    totalArticles = int(re.search(r'\((.*)\)',totalArticles).group(1))
+    return currentPage,totalPages,duplicate,nextPageStart,totalArticles
+
+def saveCheckPoint(checkpoint):
+    f=open('checkpoint/checkpoint.json','w')
+    json.dump(checkpoint,f)
+    f.close()
+    logger.info('Save checkpoint at {}'.format)
+def loadCheckPoint():
+    try:
+        f=open('checkpoint/checkpoint.json','r')
+        checkpoint = json.load(f)
+        f.close()
+        logger.info('Load checkpoint from file: {}'.format(checkpoint))
+    except:
+        logger.info('No checkpoint has been founded, Create a new checkpoint!')
+        checkpoint = {'Dowjones':0, 'Publication':0, 'Web News': 0}
+
+    return checkpoint
+
+def crawlFectiva(browser,checkpoint):
+    if checkpoint == None:
+        checkpoint['Publication'] = 0
+        checkpoint['Dowjones'] = 0
+    for source in ['Publication','Dowjones']:
+        dataChannel = browser.find_element_by_xpath('//span[@data-channel="{}"]'.format(source))
+        dataChannel.click()
+        logger.info('Start source from:{}...'.format(source))
+        wait = WebDriverWait(browser, 40)
+        btn = wait.until(EC.presence_of_element_located((By.XPATH, '//span[@class="tabOn"][@data-channel="{}"]'.format(source))))
+        
+        #Compute the total pages we need to download
+        currentPage,totalPages,duplicate,nextPageStart,totalArticles = getStatus(browser)
+        #Load checkpoint
+        checkPointPage = checkpoint[source]
+        
+        while currentPage != totalPages or checkPointPage!=currentPage:
+            
+            for i in range(abs(checkPointPage - currentPage)):
+                #Compute the total pages we need to download
+                currentPage,totalPages,duplicate,nextPageStart,totalArticles = getStatus(browser)
+                
+                btn_nextpage = browser.find_element_by_xpath('//a[@class="nextItem"]')
+                btn_nextpage.click()
+                wait.until(EC.text_to_be_present_in_element((By.XPATH, '//div[@id="headlines"]/table/tbody/tr[@class="headline"][1]/td[@class="count"]'), '{}.'.format(nextPageStart) ))
+
+
+            #Compute the total pages we need to download
+            currentPage,totalPages,duplicate,nextPageStart,totalArticles = getStatus(browser)
+
+            for id in range(1,100):
+                
+                headline = browser.find_element_by_xpath('//div[@id="headlines"]/table/tbody/tr[{}]/td[3]/a'.format( id ))
+                documentID = browser.find_element_by_xpath('//div[@id="headlines"]/table/tbody/tr[{}]/td[3]/div[3]'.format(id)).text
+                documentID =  re.search(r'\(Document (.*)\)',documentID).group(1)
+                documentType = browser.find_element_by_xpath('//div[@id="headlines"]/table/tbody/tr[{}]/td[3]/img'.format(id)).get_attribute('title')
+                if documentType != 'Factiva Licensed Content':
+                    continue
+                logger.debug('Crawl: {} Article Title is:{}'.format(currentPage * 100 + id,headline.text))
+                logger.info('{:.1%} Get {} of 100 in page {}.Totally {} pages {} articles'.format((currentPage*100+id)/totalArticles,id, currentPage,totalPages,totalArticles))
+                headline.click()
+                wait.until(EC.text_to_be_present_in_element((By.XPATH, '//div[@id="artHdr1"]/span[1]'), 'Article {}'.format(currentPage * 100 + id) ))
+                articleHtml = browser.find_element_by_xpath('//div[@class="article enArticle"]')
+           
+                file_object = open('data/{}.html'.format(documentID), "w")
+                file_object.write(articleHtml.get_attribute('innerHTML'))
+                file_object.close()
+                sleep(1)
+         
+              #sometimes recaptcha occurs here
+              #view next page
+            
+            if currentPage == totalPages:
+                break
+            
+            checkpoint[source] = currentPage
+            saveCheckPoint(checkpoint)
+
+            btn_nextpage = browser.find_element_by_xpath('//a[@class="nextItem"]')
+            btn_nextpage.click()
+            wait.until(EC.text_to_be_present_in_element((By.XPATH, '//div[@id="headlines"]/table/tbody/tr[@class="headline"][1]/td[@class="count"]'), '{}.'.format(nextPageStart) ))
+
+
+for elem in anuID:
+    account = elem['id']
+    password = elem['psw']
+    cookie = loginFectiva(browser,account,password)
+
+
+
+checkpoint = loadCheckPoint()
+
+try:
+    crawlFectiva(browser,checkpoint)
+except TimeoutException:
+    logger.error('Timeout during crawling pages')
+
+browser.close()
+
+
+#print(cookie)
+logger.info("Get Cookies Finish!( Num:%d)" % len(cookie))
