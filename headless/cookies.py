@@ -45,8 +45,8 @@ if os.name == 'nt':
     chrome_driver = os.getcwd() +"/chromedriver/win_chromedriver.exe"
 elif os.name =='posix':
 	chrome_driver = os.getcwd() +"/chromedriver/linux_chromedriver"
-else:
-    chrome_driver = os.getcwd() +"/chromedriver/mac_chromedriver"
+#else:
+#chrome_driver = os.getcwd() +"/chromedriver/mac_chromedriver"
 
 
 #login by using headless chrome
@@ -130,7 +130,7 @@ def saveCheckPoint(checkpoint):
     f=open('checkpoint/checkpoint.json','w')
     json.dump(checkpoint,f)
     f.close()
-    logger.info('Save checkpoint at {}'.format)
+    logger.info('Save checkpoint at {}'.format(checkpoint))
 def loadCheckPoint():
     try:
         f=open('checkpoint/checkpoint.json','r')
@@ -139,19 +139,17 @@ def loadCheckPoint():
         logger.info('Load checkpoint from file: {}'.format(checkpoint))
     except:
         logger.info('No checkpoint has been founded, Create a new checkpoint!')
-        checkpoint = {'Dowjones':0, 'Publication':0, 'Web News': 0}
+        checkpoint = {'Dowjones':0, 'Publication':0, 'Website': 0}
 
     return checkpoint
 
 def crawlFectiva(browser,checkpoint):
-    if checkpoint == None:
-        checkpoint['Publication'] = 0
-        checkpoint['Dowjones'] = 0
-    for source in ['Publication','Dowjones']:
+
+    for source in ['Publication','Dowjones','Website']:
         dataChannel = browser.find_element_by_xpath('//span[@data-channel="{}"]'.format(source))
         dataChannel.click()
         logger.info('Start source from:{}...'.format(source))
-        wait = WebDriverWait(browser, 40)
+        wait = WebDriverWait(browser, 10)
         btn = wait.until(EC.presence_of_element_located((By.XPATH, '//span[@class="tabOn"][@data-channel="{}"]'.format(source))))
         
         #Compute the total pages we need to download
@@ -179,18 +177,29 @@ def crawlFectiva(browser,checkpoint):
                 documentID = browser.find_element_by_xpath('//div[@id="headlines"]/table/tbody/tr[{}]/td[3]/div[3]'.format(id)).text
                 documentID =  re.search(r'\(Document (.*)\)',documentID).group(1)
                 documentType = browser.find_element_by_xpath('//div[@id="headlines"]/table/tbody/tr[{}]/td[3]/img'.format(id)).get_attribute('title')
-                if documentType != 'Factiva Licensed Content':
-                    continue
-                
-                logger.info('{:.1%} Get {} of 100 in page {}.Totally {} pages {} articles'.format((currentPage*100+id)/totalArticles,id, currentPage,totalPages,totalArticles))
-                headline.click()
-                wait.until(EC.text_to_be_present_in_element((By.XPATH, '//div[@id="artHdr1"]/span[1]'), 'Article {}'.format(currentPage * 100 + id) ))
-                articleHtml = browser.find_element_by_xpath('//div[@class="article enArticle"]')
-           
-                file_object = open('data/{}.html'.format(documentID), "w")
-                file_object.write(articleHtml.get_attribute('innerHTML').encode('utf-8'))
-                file_object.close()
-                sleep(1)
+                if documentType == 'Factiva Licensed Content':
+                    logger.info('{:.1%} Get {} of 100 in page {}.Totally {} pages {} articles'.format((currentPage*100+id)/float(totalArticles),id, currentPage,totalPages,totalArticles))
+                    logger.debug('id:{}, documentID:{}, {}Title of headline:{}'.format(id,documentID,headline.text))
+                    headline.click()
+                    wait.until(EC.text_to_be_present_in_element((By.XPATH, '//div[@id="artHdr1"]/span[1]'), 'Article {}'.format(currentPage * 100 + id) ))
+                    articleHtml = browser.find_element_by_xpath('//div[@class="article enArticle"]')
+
+                    file_object = open('data/{}.html'.format(documentID), "w")
+                    file_object.write(articleHtml.get_attribute('innerHTML').encode('utf-8'))
+                    file_object.close()
+                    sleep(1)
+                if documentType == 'HTML':
+                    logger.info('{:.1%} Get {} of 100 in page {}.Totally {} pages {} articles'.format((currentPage*100+id)/totalArticles,id, currentPage,totalPages,totalArticles))
+                    headline.click()
+                    window_main = browser.window_handles[0]
+                    window_download = browser.window_handles[-1]
+                    browser.switch_to_window(window_download)
+                    sleep(4)
+                    browser.get_screenshot_as_file('data/{}.png'.format(documentID))
+                    browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + 'w')
+                    browser.switch_to_window(window_main)
+                    
+
          
               #sometimes recaptcha occurs here
               #view next page
