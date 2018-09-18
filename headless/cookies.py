@@ -7,18 +7,18 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import TimeoutException,NoSuchElementException,ElementNotVisibleException,WebDriverException
+from selenium.common.exceptions import TimeoutException,NoSuchElementException,ElementNotVisibleException,WebDriverException,UnexpectedAlertPresentException
 from selenium.webdriver.support.ui import Select
 from time import sleep
 import re
-
+import math
 import json
 import logging
 from datetime import datetime
 
-import sys
-reload(sys)
-sys.setdefaultencoding('utf-8')
+#import sys
+#reload(sys)
+#sys.setdefaultencoding('utf-8')
 
 
 logger = logging.getLogger(__name__)
@@ -38,20 +38,20 @@ anuID=[
 GATEWAY = 'ANULIB'
 
 queryTerms = '((chin* or hong kong)) and (( (residential or site or commercial) and (casino resort or island or hotel or apartment or park or estate or property) and (group or firm or company or board or entitys) and (transaction* or purchase* or sale or sold or buy) ) or ( (uranium or wind or gold or solar or ore or copper or energy or alumina or iron or lead or coal or oil) and (bonds or acquisition or merge or purchase or sale or stake or equity) and (million* or billion* or B or M) and (operations or mining or firm or company)) or ( (dairy or cheese or butter or milk or bread or wine) and (sold or buy or sale or equity or stake or merge or acquire) and (brand or company or business or group or firm or board) and (million* or billion* or B or M))) not (terrorism or war or navy or stock market or share market or Wall St or Wall Street or Forex or Stock Exchange or rst=asxtex) and re=austr'
-queryPeriod = 'In the last 2 years'
+queryPeriod = 'In the last 3 months'
 
 #Check Platform to load chromedriver
 if os.name == 'nt':
     chrome_driver = os.getcwd() +"/chromedriver/win_chromedriver.exe"
-elif os.name =='posix':
-	chrome_driver = os.getcwd() +"/chromedriver/linux_chromedriver"
-#else:
-#chrome_driver = os.getcwd() +"/chromedriver/mac_chromedriver"
+#elif os.name =='posix':
+#	chrome_driver = os.getcwd() +"/chromedriver/linux_chromedriver"
+else:
+    chrome_driver = os.getcwd() +"/chromedriver/mac_chromedriver"
 
 
 #login by using headless chrome
 chrome_options = Options()
-chrome_options.add_argument("--headless")
+#chrome_options.add_argument("--headless")
 chrome_options.add_argument("--window-size=1920x1080")
 browser = webdriver.Chrome(chrome_options=chrome_options, executable_path=chrome_driver)
 
@@ -82,8 +82,8 @@ def loginFectiva(browser,account,pwd):
             browser.get_screenshot_as_file("logs/login.png")
             btn = wait.until(EC.presence_of_element_located((By.ID, 'btnSearchBottom')))
             #swith from smart search to fix search
-            switch = browser.find_element_by_id("switchbutton")
-            switch.click()
+            #switch = browser.find_element_by_id("switchbutton")
+            #switch.click()
             sleep(1)
             input = browser.find_element_by_id('ftx')
             input.send_keys(queryTerms)
@@ -116,16 +116,37 @@ def loginFectiva(browser,account,pwd):
 
 def getStatus(browser):
     #Compute the total pages we need to download
+    
     pageInfo = browser.find_element_by_xpath('//span[@class="resultsBar"]').text.replace(',','')
     duplicate = browser.find_element_by_id('dedupSummary').text
     duplicate = int(re.match('Total duplicates: (.*)',duplicate).group(1))
     currentPage = int(int(re.search(r'Headlines (.*) - (.*) of (.*)',pageInfo).group(1))/100)
-    totalPages = int((int(re.search(r'Headlines (.*) - (.*) of (.*)',pageInfo).group(3)) - duplicate)/100)-1
+    articlesInThisPage = int(re.search(r'Headlines (.*) - (.*) of (.*)',pageInfo).group(2)) - int(re.search(r'Headlines (.*) - (.*) of (.*)',pageInfo).group(1)) + 1
+    totalPages = math.ceil((int(re.search(r'Headlines (.*) - (.*) of (.*)',pageInfo).group(3))- duplicate)/100.0)-1
     nextPageStart = int(re.search(r'Headlines (.*) - (.*) of (.*)',pageInfo).group(2))+1
+    totalWebNews = browser.find_element_by_xpath('//span[@data-channel="Website"][1]/a/span[@class="hitsCount"]').text.replace(',','')
+    totalWebNews = int(re.search(r'\((.*)\)',totalWebNews).group(1))
+    totalBlogs = browser.find_element_by_xpath('//span[@data-channel="Blog"][1]/a/span[@class="hitsCount"]').text.replace(',','')
+    totalBlogs = int(re.search(r'\((.*)\)',totalBlogs).group(1))
+    
     totalArticles = browser.find_element_by_xpath('//span[@data-channel="All"][1]/a/span[@class="hitsCount"]').text.replace(',','')
     totalArticles = int(re.search(r'\((.*)\)',totalArticles).group(1))
-    return currentPage,totalPages,duplicate,nextPageStart,totalArticles
+    totalArticles = totalArticles - totalBlogs - totalWebNews
+    '''Minus WebNews'''
 
+    return currentPage,totalPages,duplicate,nextPageStart,totalArticles,articlesInThisPage
+
+def getArticleInfo(browser,id):
+    headline = browser.find_element_by_xpath('//div[@id="headlines"]/table/tbody/tr[{}]/td[3]/a'.format( id ))
+    documentID = browser.find_element_by_xpath('//div[@id="headlines"]/table/tbody/tr[{}]/td[3]/div[3]'.format(id)).text
+    documentID =  re.search(r'\(Document (.*)\)',documentID).group(1)
+    documentType = browser.find_element_by_xpath('//div[@id="headlines"]/table/tbody/tr[{}]/td[3]/img'.format(id)).get_attribute('title')
+    leadFields = browser.find_element_by_xpath('//div[@id="headlines"]/table/tbody/tr[{}]/td[3]/div[@class="leadFields"]'.format(id)).text.split(',')
+    author = leadFields[0]
+    date = leadFields[1]
+  
+
+    return headline,date,author,documentID,documentType
 def saveCheckPoint(checkpoint):
     f=open('checkpoint/checkpoint.json','w')
     json.dump(checkpoint,f)
@@ -145,7 +166,10 @@ def loadCheckPoint():
 
 def crawlFectiva(browser,checkpoint):
 
-    for source in ['Publication','Dowjones','Website']:
+#select = Select(browser.find_element_by_name('hso'))
+#select.select_by_visible_text('Sort by: Oldest first')
+
+    for source in ['Dowjones','Publication']:
         dataChannel = browser.find_element_by_xpath('//span[@data-channel="{}"]'.format(source))
         dataChannel.click()
         logger.info('Start source from:{}...'.format(source))
@@ -153,39 +177,38 @@ def crawlFectiva(browser,checkpoint):
         btn = wait.until(EC.presence_of_element_located((By.XPATH, '//span[@class="tabOn"][@data-channel="{}"]'.format(source))))
         
         #Compute the total pages we need to download
-        currentPage,totalPages,duplicate,nextPageStart,totalArticles = getStatus(browser)
+        currentPage,totalPages,duplicate,nextPageStart,totalArticles,articlesInThisPage = getStatus(browser)
         #Load checkpoint
         checkPointPage = checkpoint[source]
-        
-        while currentPage != totalPages or checkPointPage!=currentPage:
-            
+        logger.info('S Total pages:{} , currentAt:{} , checkPointAt:{}'.format(totalPages,currentPage,checkPointPage))
+        while currentPage != totalPages or checkPointPage!=currentPage or totalPages == 0:
+            logger.info('Total pages:{} , currentAt:{} , checkPointAt:{}'.format(totalPages,currentPage,checkPointPage))
             for i in range(abs(checkPointPage - currentPage)):
                 #Compute the total pages we need to download
-                currentPage,totalPages,duplicate,nextPageStart,totalArticles = getStatus(browser)
-                
+                currentPage,totalPages,duplicate,nextPageStart,totalArticles,articlesInThisPage = getStatus(browser)
+                logger.info('Skip Page To checkPoint...Total pages:{} , currentAt:{} , checkPointAt:{}'.format())
                 btn_nextpage = browser.find_element_by_xpath('//a[@class="nextItem"]')
                 btn_nextpage.click()
                 wait.until(EC.text_to_be_present_in_element((By.XPATH, '//div[@id="headlines"]/table/tbody/tr[@class="headline"][1]/td[@class="count"]'), '{}.'.format(nextPageStart) ))
 
 
             #Compute the total pages we need to download
-            currentPage,totalPages,duplicate,nextPageStart,totalArticles = getStatus(browser)
+            currentPage,totalPages,duplicate,nextPageStart,totalArticles,articlesInThisPage = getStatus(browser)
 
-            for id in range(1,100):
+            for id in range(1,articlesInThisPage + 1):
                 
-                headline = browser.find_element_by_xpath('//div[@id="headlines"]/table/tbody/tr[{}]/td[3]/a'.format( id ))
-                documentID = browser.find_element_by_xpath('//div[@id="headlines"]/table/tbody/tr[{}]/td[3]/div[3]'.format(id)).text
-                documentID =  re.search(r'\(Document (.*)\)',documentID).group(1)
-                documentType = browser.find_element_by_xpath('//div[@id="headlines"]/table/tbody/tr[{}]/td[3]/img'.format(id)).get_attribute('title')
+                headline,date,author,documentID,documentType = getArticleInfo(browser,id)
+         
                 if documentType == 'Factiva Licensed Content':
-                    logger.info('{:.1%} Get {} of 100 in page {}.Totally {} pages {} articles'.format((currentPage*100+id)/float(totalArticles),id, currentPage,totalPages,totalArticles))
-                    logger.debug('id:{}, documentID:{}, {}Title of headline:{}'.format(id,documentID,headline.text))
+                    logger.info('{:.1%} Get {} of {} in page {}.Totally {} pages {} articles'.format((currentPage*100+id)/float(totalArticles),id,articlesInThisPage, currentPage,totalPages,totalArticles))
+                    
+                    logger.debug('id:{}, documentID:{}, Headline:{}, date:{}, author:{} '.format(id,documentID,headline.text,date,author))
                     headline.click()
                     wait.until(EC.text_to_be_present_in_element((By.XPATH, '//div[@id="artHdr1"]/span[1]'), 'Article {}'.format(currentPage * 100 + id) ))
                     articleHtml = browser.find_element_by_xpath('//div[@class="article enArticle"]')
 
                     file_object = open('data/{}.html'.format(documentID), "w")
-                    file_object.write(articleHtml.get_attribute('innerHTML').encode('utf-8'))
+                    file_object.write(articleHtml.get_attribute('innerHTML'))
                     file_object.close()
                     sleep(1)
                 if documentType == 'HTML':
@@ -195,7 +218,9 @@ def crawlFectiva(browser,checkpoint):
                     window_download = browser.window_handles[-1]
                     browser.switch_to_window(window_download)
                     sleep(4)
-                    browser.get_screenshot_as_file('data/{}.png'.format(documentID))
+                    file_object = open('data/{}.html'.format(documentID), "w")
+                    file_object.write(browser.page_source)
+                    file_object.close()
                     browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + 'w')
                     browser.switch_to_window(window_main)
                     
@@ -228,6 +253,8 @@ try:
     crawlFectiva(browser,checkpoint)
 except TimeoutException:
     logger.error('Timeout during crawling pages')
+except UnexpectedAlertPresentException:
+    logger.error('Fectiva alert:We are unable to process your request at this time.  Please try again in a few minutes.')
 
 browser.close()
 
