@@ -4,7 +4,7 @@ import MySQLdb
 
 db = MySQLdb.connect("localhost", "root", "lygame218", "NLP", charset='utf8')
     
-def process_item(item):
+def process_item(id,title,author,content,date,crawldate,url,source,type,text):
     """ 判断item的类型，并作相应的处理，再入数据库 """
     
     if isinstance(item, ArticleItem):

@@ -186,7 +186,7 @@ def crawlFectiva(browser,checkpoint):
             for i in range(abs(checkPointPage - currentPage)):
                 #Compute the total pages we need to download
                 currentPage,totalPages,duplicate,nextPageStart,totalArticles,articlesInThisPage = getStatus(browser)
-                logger.info('Skip Page To checkPoint...Total pages:{} , currentAt:{} , checkPointAt:{}'.format())
+                logger.info('Skip Page To checkPoint...Total pages:{} , currentAt:{} , checkPointAt:{}'.format(totalPages,currentPage,checkPointPage))
                 btn_nextpage = browser.find_element_by_xpath('//a[@class="nextItem"]')
                 btn_nextpage.click()
                 wait.until(EC.text_to_be_present_in_element((By.XPATH, '//div[@id="headlines"]/table/tbody/tr[@class="headline"][1]/td[@class="count"]'), '{}.'.format(nextPageStart) ))
