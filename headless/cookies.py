@@ -15,7 +15,9 @@ import math
 import json
 import logging
 from datetime import datetime
-
+import cgi
+from pipeline import process_item
+from dateutil.parser import parse
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -37,7 +39,7 @@ anuID=[
 GATEWAY = 'ANULIB'
 
 queryTerms = '((chin* or hong kong)) and (( (residential or site or commercial) and (casino resort or island or hotel or apartment or park or estate or property) and (group or firm or company or board or entitys) and (transaction* or purchase* or sale or sold or buy) ) or ( (uranium or wind or gold or solar or ore or copper or energy or alumina or iron or lead or coal or oil) and (bonds or acquisition or merge or purchase or sale or stake or equity) and (million* or billion* or B or M) and (operations or mining or firm or company)) or ( (dairy or cheese or butter or milk or bread or wine) and (sold or buy or sale or equity or stake or merge or acquire) and (brand or company or business or group or firm or board) and (million* or billion* or B or M))) not (terrorism or war or navy or stock market or share market or Wall St or Wall Street or Forex or Stock Exchange or rst=asxtex) and re=austr'
-queryPeriod = 'In the last 2 years'
+queryPeriod = 'In the last 5 years'
 
 #Check Platform to load chromedriver
 if os.name == 'nt':
@@ -205,11 +207,6 @@ def crawlFectiva(browser,checkpoint):
                     headline.click()
                     wait.until(EC.text_to_be_present_in_element((By.XPATH, '//div[@id="artHdr1"]/span[1]'), 'Article {}'.format(currentPage * 100 + id) ))
                     articleHtml = browser.find_element_by_xpath('//div[@class="article enArticle"]')
-'''
-                    file_object = open('data/{}.html'.format(documentID), "w")
-                    file_object.write(articleHtml.get_attribute('innerHTML'))
-                    file_object.close()
-'''
                     title =headline.text
                     content = articleHtml.get_attribute('innerHTML')
                     date = parse(date).strftime('%Y-%m-%d')

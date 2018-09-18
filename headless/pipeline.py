@@ -13,6 +13,7 @@ def process_item(id,title,author,content,date,crawldate,url):
     """ 判断item的类型，并作相应的处理，再入数据库 """
     
     try:
+	content = MySQLdb.escape_string(content)
         sql = "insert into NLP_ARTICLE(ID,title,author,content,date,crawldate,url) values('%s','%s','%s','%s','%s','%s','%s')"
         params =(id, title, author,content, date,crawldate,url)
         # 执行sql语句
