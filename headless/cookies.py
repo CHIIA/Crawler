@@ -215,6 +215,8 @@ def crawlFectiva(browser,checkpoint):
                     process_item(documentID,title,author,content,date,crawldate,url)
                     sleep(1)
                 if documentType == 'HTML':
+                    pass
+                    '''
                     logger.info('{:.1%} Get {} of 100 in page {}.Totally {} pages {} articles'.format((currentPage*100+id)/totalArticles,id, currentPage,totalPages,totalArticles))
                     headline.click()
                     window_main = browser.window_handles[0]
@@ -226,6 +228,7 @@ def crawlFectiva(browser,checkpoint):
                     file_object.close()
                     browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + 'w')
                     browser.switch_to_window(window_main)
+                    '''
                     
 
          
