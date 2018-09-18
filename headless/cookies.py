@@ -16,11 +16,9 @@ import json
 import logging
 from datetime import datetime
 
-'''
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
-'''
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level = logging.INFO,format = '%(asctime)s - %(levelname)s - %(message)s')#,filename='./logs/{}.log'.format(datetime.now()))
@@ -43,16 +41,16 @@ queryPeriod = 'In the last 2 years'
 
 #Check Platform to load chromedriver
 if os.name == 'nt':
-    chrome_driver = os.getcwd() +"/chromedriver/win_chromedriver.exe"
-        #elif os.name =='posix':
-#	chrome_driver = os.getcwd() +"/chromedriver/linux_chromedriver"
-else:
-    chrome_driver = os.getcwd() +"/chromedriver/mac_chromedriver"
+	chrome_driver = os.getcwd() +"/chromedriver/win_chromedriver.exe"
+elif os.name =='posix':
+	chrome_driver = os.getcwd() +"/chromedriver/linux_chromedriver"
+#else:
+#    chrome_driver = os.getcwd() +"/chromedriver/mac_chromedriver"
 
 
 #login by using headless chrome
 chrome_options = Options()
-#chrome_options.add_argument("--headless")
+chrome_options.add_argument("--headless")
 chrome_options.add_argument("--window-size=1920x1080")
 browser = webdriver.Chrome(chrome_options=chrome_options, executable_path=chrome_driver)
 
@@ -207,10 +205,17 @@ def crawlFectiva(browser,checkpoint):
                     headline.click()
                     wait.until(EC.text_to_be_present_in_element((By.XPATH, '//div[@id="artHdr1"]/span[1]'), 'Article {}'.format(currentPage * 100 + id) ))
                     articleHtml = browser.find_element_by_xpath('//div[@class="article enArticle"]')
-
+'''
                     file_object = open('data/{}.html'.format(documentID), "w")
                     file_object.write(articleHtml.get_attribute('innerHTML'))
                     file_object.close()
+'''
+                    title =headline.text
+                    content = articleHtml.get_attribute('innerHTML')
+                    date = parse(date).strftime('%Y-%m-%d')
+                    crawldate = parse(str(datetime.now())).strftime('%Y-%m-%d')
+                    url = ''
+                    process_item(documentID,title,author,content,date,crawldate,url)
                     sleep(1)
                 if documentType == 'HTML':
                     logger.info('{:.1%} Get {} of 100 in page {}.Totally {} pages {} articles'.format((currentPage*100+id)/totalArticles,id, currentPage,totalPages,totalArticles))
