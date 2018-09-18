@@ -16,10 +16,11 @@ import json
 import logging
 from datetime import datetime
 
+'''
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
-
+'''
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level = logging.INFO,format = '%(asctime)s - %(levelname)s - %(message)s')#,filename='./logs/{}.log'.format(datetime.now()))
@@ -38,15 +39,15 @@ anuID=[
 GATEWAY = 'ANULIB'
 
 queryTerms = '((chin* or hong kong)) and (( (residential or site or commercial) and (casino resort or island or hotel or apartment or park or estate or property) and (group or firm or company or board or entitys) and (transaction* or purchase* or sale or sold or buy) ) or ( (uranium or wind or gold or solar or ore or copper or energy or alumina or iron or lead or coal or oil) and (bonds or acquisition or merge or purchase or sale or stake or equity) and (million* or billion* or B or M) and (operations or mining or firm or company)) or ( (dairy or cheese or butter or milk or bread or wine) and (sold or buy or sale or equity or stake or merge or acquire) and (brand or company or business or group or firm or board) and (million* or billion* or B or M))) not (terrorism or war or navy or stock market or share market or Wall St or Wall Street or Forex or Stock Exchange or rst=asxtex) and re=austr'
-queryPeriod = 'In the last 3 months'
+queryPeriod = 'In the last 2 years'
 
 #Check Platform to load chromedriver
 if os.name == 'nt':
     chrome_driver = os.getcwd() +"/chromedriver/win_chromedriver.exe"
-elif os.name =='posix':
-	chrome_driver = os.getcwd() +"/chromedriver/linux_chromedriver"
-#else:
-#    chrome_driver = os.getcwd() +"/chromedriver/mac_chromedriver"
+        #elif os.name =='posix':
+#	chrome_driver = os.getcwd() +"/chromedriver/linux_chromedriver"
+else:
+    chrome_driver = os.getcwd() +"/chromedriver/mac_chromedriver"
 
 
 #login by using headless chrome
