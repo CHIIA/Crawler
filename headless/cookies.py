@@ -16,9 +16,9 @@ import json
 import logging
 from datetime import datetime
 
-#import sys
-#reload(sys)
-#sys.setdefaultencoding('utf-8')
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 
 logger = logging.getLogger(__name__)
@@ -43,10 +43,10 @@ queryPeriod = 'In the last 3 months'
 #Check Platform to load chromedriver
 if os.name == 'nt':
     chrome_driver = os.getcwd() +"/chromedriver/win_chromedriver.exe"
-#elif os.name =='posix':
-#	chrome_driver = os.getcwd() +"/chromedriver/linux_chromedriver"
-else:
-    chrome_driver = os.getcwd() +"/chromedriver/mac_chromedriver"
+elif os.name =='posix':
+	chrome_driver = os.getcwd() +"/chromedriver/linux_chromedriver"
+#else:
+#    chrome_driver = os.getcwd() +"/chromedriver/mac_chromedriver"
 
 
 #login by using headless chrome
