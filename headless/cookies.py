@@ -180,14 +180,14 @@ def crawlFectiva(browser,checkpoint):
         #Compute the total pages we need to download
         currentPage,totalPages,duplicate,nextPageStart,totalArticles,articlesInThisPage = getStatus(browser)
         #Load checkpoint
-        checkPointPage = checkpoint[source]
-        logger.info('S Total pages:{} , currentAt:{} , checkPointAt:{}'.format(totalPages,currentPage,checkPointPage))
-        while currentPage != totalPages or checkPointPage!=currentPage or totalPages == 0:
-            logger.info('Total pages:{} , currentAt:{} , checkPointAt:{}'.format(totalPages,currentPage,checkPointPage))
-            for i in range(abs(checkPointPage - currentPage)):
+	checkpoint = loadCheckPoint()
+        logger.info('S Total pages:{} , currentAt:{} , checkPointAt:{}'.format(totalPages,currentPage,checkpoint[source]))
+        while currentPage != totalPages or checkpoint[source]!=currentPage or totalPages == 0:
+            logger.info('Total pages:{} , currentAt:{} , checkPointAt:{}'.format(totalPages,currentPage,checkpoint[source]))
+            for i in range(abs(checkpoint[source] - currentPage)):
                 #Compute the total pages we need to download
                 currentPage,totalPages,duplicate,nextPageStart,totalArticles,articlesInThisPage = getStatus(browser)
-                logger.info('Skip Page To checkPoint...Total pages:{} , currentAt:{} , checkPointAt:{}'.format(totalPages,currentPage,checkPointPage))
+                logger.info('Skip Page To checkPoint...Total pages:{} , currentAt:{} , checkPointAt:{}'.format(totalPages,currentPage,checkpoint[source]))
                 btn_nextpage = browser.find_element_by_xpath('//a[@class="nextItem"]')
                 btn_nextpage.click()
                 wait.until(EC.text_to_be_present_in_element((By.XPATH, '//div[@id="headlines"]/table/tbody/tr[@class="headline"][1]/td[@class="count"]'), '{}.'.format(nextPageStart) ))
@@ -209,10 +209,13 @@ def crawlFectiva(browser,checkpoint):
                     articleHtml = browser.find_element_by_xpath('//div[@class="article enArticle"]')
                     title =headline.text
                     content = articleHtml.get_attribute('innerHTML')
-                    date = parse(date).strftime('%Y-%m-%d')
-                    crawldate = parse(str(datetime.now())).strftime('%Y-%m-%d')
-                    url = ''
-                    process_item(documentID,title,author,content,date,crawldate,url)
+                    try:
+                    	date = parse(date).strftime('%Y-%m-%d')
+                    	crawldate = parse(str(datetime.now())).strftime('%Y-%m-%d')
+                    	url = ''
+                    	process_item(documentID,title,author,content,date,crawldate,url)
+                    except:
+			pass
                     sleep(1)
                 if documentType == 'HTML':
                     pass
@@ -246,22 +249,19 @@ def crawlFectiva(browser,checkpoint):
             wait.until(EC.text_to_be_present_in_element((By.XPATH, '//div[@id="headlines"]/table/tbody/tr[@class="headline"][1]/td[@class="count"]'), '{}.'.format(nextPageStart) ))
 
 
-for elem in anuID:
-    account = elem['id']
-    password = elem['psw']
-    cookie = loginFectiva(browser,account,password)
 
 
-
-checkpoint = loadCheckPoint()
-
-try:
-    crawlFectiva(browser,checkpoint)
-except TimeoutException:
-    logger.error('Timeout during crawling pages')
-except UnexpectedAlertPresentException:
-    logger.error('Fectiva alert:We are unable to process your request at this time.  Please try again in a few minutes.')
-
+while 1:
+	checkpoint = loadCheckPoint()
+	loginFectiva(browser,'','')
+	try:
+    		crawlFectiva(browser,checkpoint)
+		break;
+	except TimeoutException:
+		logger.error('Timeout during crawling pages')
+	except UnexpectedAlertPresentException:
+    		logger.error('Fectiva alert:We are unable to process your request at this time.  Please try again in a few minutes.')
+logger.info('Finish!')
 browser.close()
 
 
