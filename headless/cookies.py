@@ -13,23 +13,14 @@ from time import sleep
 import re
 import math
 import json
-import logging
 from datetime import datetime
 import cgi
 from pipeline import processItem,checkItemExist,loadSettings,updateProgress
 from dateutil.parser import parse
+from log import logger
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
-
-logger = logging.getLogger(__name__)
-logging.basicConfig(level = logging.INFO,format = '%(asctime)s - %(levelname)s - %(message)s')#,filename='./logs/{}.log'.format(datetime.now()))
-logging.getLogger("selenium").setLevel(logging.CRITICAL)  # 将selenium的日志级别设成DEBUG，太烦人
-
-formatter = logging.Formatter(
-                              '%(asctime)s - %(name)s - %(levelname)s: - %(message)s',
-                              datefmt='%Y-%m-%d %H:%M:%S')
-
 
 
 anuID=[
@@ -155,13 +146,12 @@ def getArticleInfo(browser,id, source):
     documentType = browser.find_element_by_xpath('//div[@id="headlines"]/table/tbody/tr[{}]/td[3]/img'.format(id)).get_attribute('title')
     leadFields = browser.find_element_by_xpath('//div[@id="headlines"]/table/tbody/tr[{}]/td[3]/div[@class="leadFields"]'.format(id)).text.split(',')
     author = leadFields[0]
-    if source == 'Website':
-	date = leadFields[2]
-    else:
-    	date = leadFields[1]
-  
-
-    return headline,date,author,documentID,documentType
+    for date in leadFields:
+	try:
+            parse(date).strftime('%Y-%m-%d')
+            return headline,date,author,documentID,documentType 
+        except:
+            pass
 def saveCheckPoint(checkpoint):
     f=open('checkpoint/checkpoint.json','w')
     json.dump(checkpoint,f)
@@ -184,7 +174,7 @@ def crawlFectiva(browser,checkpoint):
 #select = Select(browser.find_element_by_name('hso'))
 #select.select_by_visible_text('Sort by: Oldest first')
     crawled_pages = 0
-    for source in ['Blog','Dowjones','Publication','Website']:
+    for source in ['Blog','Website','Dowjones','Publication']:
         logger.info('Start crawling articles from: {}...'.format(source))        
         articlesOfChannel = browser.find_element_by_xpath('//span[@data-channel="{}"][1]/a/span[@class="hitsCount"]'.format(source)).text.replace(',','')
         articlesOfChannel = int(re.search('\((.*)\)',articlesOfChannel).group(1)) 
@@ -224,39 +214,44 @@ def crawlFectiva(browser,checkpoint):
                     logger.info('{:.1%} item {} exist in database skip to next one.'.format(crawled_pages/float(totalArticles),id))
                     continue     
                 if documentType == 'Factiva Licensed Content':
-                    logger.info('{:.1%} Get {} of {} in page {}.Totally {} pages {} articles'.format(crawled_pages/float(totalArticles),id,articlesInThisPage, currentPage,totalPages,totalArticles))
+                    logger.info('{:.1%} [DOC] Get {} of {} in page {}.Totally {} pages {} articles'.format(crawled_pages/float(totalArticles),id,articlesInThisPage, currentPage,totalPages,totalArticles))
                     
                     logger.debug('id:{}, documentID:{}, Headline:{}, date:{}, author:{} '.format(id,documentID,headline.text,date,author))
                     headline.click()
+                    logger.debug('waiting content response')
                     wait.until(EC.text_to_be_present_in_element((By.XPATH, '//div[@id="artHdr1"]/span[1]'), 'Article {}'.format(currentPage * 100 + id) ))
+                    logger.debug('get content response')
                     articleHtml = browser.find_element_by_xpath('//div[@class="article enArticle"]')
                     title =headline.text
                     content = articleHtml.get_attribute('innerHTML')
-                    try:
-                    	date = parse(date).strftime('%Y-%m-%d')
-                    	crawldate = parse(str(datetime.now())).strftime('%Y-%m-%d')
-                    	url = ''
-                    	processItem(documentID,title,author,content,date,crawldate,url,source)
-                    except:
-			pass
+                    
+                    date = parse(date).strftime('%Y-%m-%d')
+                    crawldate = parse(str(datetime.now())).strftime('%Y-%m-%d')
+                    url = ''
+                    processItem(documentID,title,author,content,date,crawldate,url,source)
                     sleep(1)
                 if documentType == 'HTML':
-                    logger.info('{:.1%} Get {} of 100 in page {}.Totally {} pages {} articles'.format(crawled_pages/float(totalArticles),id, currentPage,totalPages,totalArticles))
-                    headline.click()
-                    title = headline.text
-                    window_main = browser.window_handles[0]
-                    window_download = browser.window_handles[-1]
-                    browser.switch_to_window(window_download)
-                    sleep(4)
-                    content = browser.page_source
-                    logger.debug('id:{}, documentID:{}, Headline:{}, date:{}, author:{} '.format(id,documentID,title,date,author))
-		    try:
-                        date = parse(date).strftime('%Y-%m-%d')
-                        crawldate = parse(str(datetime.now())).strftime('%Y-%m-%d')
-                        url = browser.current_url
-                        processItem(documentID,title,author,content,date,crawldate,url,source)
+                    logger.info('{:.1%} [HTM]Get {} of 100 in page {}.Totally {} pages {} articles'.format(crawled_pages/float(totalArticles),id, currentPage,totalPages,totalArticles))
+                    browser.set_page_load_timeout(6)
+                    try: 
+                    	headline.click()
+                    	title = headline.text
+                    	window_main = browser.window_handles[0]
+                    	window_download = browser.window_handles[-1]
+                    	browser.switch_to_window(window_download)
+                    	sleep(3)
+                    	url = browser.current_url
+                    	logger.debug('Try to get html page source')
+                        content = browser.page_source
+                        logger.info('Get website success.')
                     except:
-                        pass
+                        content = '<h1><a href="{}">Link</h1>'.format(url)
+                        logger.warning('No response from {} of page {} title:{}, url:{}'.format(documentID,currentPage,title,url))
+                        
+                    logger.debug('id:{}, documentID:{}, Headline:{}, date:{}, author:{} '.format(id,documentID,title,date,author))
+                    date = parse(date).strftime('%Y-%m-%d')
+                    crawldate = parse(str(datetime.now())).strftime('%Y-%m-%d')
+                    processItem(documentID,title,author,content,date,crawldate,url,source)
 
                     browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + 'w')
                     browser.switch_to_window(window_main)
@@ -295,9 +290,9 @@ while 1:
 	except UnexpectedAlertPresentException:
     		logger.error('Fectiva alert:We are unable to process your request at this time.  Please try again in a few minutes.')
 		browser.close()
-	except Exception as e:
-		logger.error('Critical error occured, because {}. restart crawler'.format(e))
-		browser.close()
+	#except Exception as e:
+		#logger.error('Critical error occured, because {}. restart crawler'.format(e))
+		#browser.close()
 logger.info('Finish!')
 browser.close()
 

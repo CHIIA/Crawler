@@ -1,8 +1,7 @@
 # encoding=utf-8
 import MySQLdb
-import logging
+from log import logger
 
-logger = logging.getLogger('MYSQL')
 
 logger.info('Start connect to Mysql')
 db = MySQLdb.connect("localhost", "root", "root", "NLP", charset='utf8')
@@ -54,6 +53,14 @@ def loadSettings():
         		settings[key] = (cursor.fetchone())[0]
 			logger.info('Load settings: {} = {}'.format(key,settings[key]))
 	return settings
+def getTaskID():
+	sql = "select id from NLP_SPIDER order by id DESC limit 1"
+	cursor = db.cursor()
+        cursor.execute(sql) 
+	id = (cursor.fetchone())[0]
+	return id
+def getDatabase():
+	return db
 def updateProgress(progress):
         sql = "update NLP_SPIDER set progress={}  where id = {}".format(progress,settings['id']) 
         cursor = db.cursor()
