@@ -201,7 +201,7 @@ def crawlFectiva(browser,checkpoint):
                 btn_nextpage = browser.find_element_by_xpath('//a[@class="nextItem"]')
                 btn_nextpage.click()
                 wait.until(EC.text_to_be_present_in_element((By.XPATH, '//div[@id="headlines"]/table/tbody/tr[@class="headline"][1]/td[@class="count"]'), '{}.'.format(nextPageStart) ))
-
+		crawled_pages += 100
 
             #Compute the total pages we need to download
             currentPage,totalPages,nextPageStart,totalArticles,articlesInThisPage = getStatus(browser)
@@ -229,7 +229,7 @@ def crawlFectiva(browser,checkpoint):
                     crawldate = parse(str(datetime.now())).strftime('%Y-%m-%d')
                     url = ''
                     processItem(documentID,title,author,content,date,crawldate,url,source)
-                    sleep(1)
+                    sleep(2)
                 if documentType == 'HTML':
                     logger.info('{:.1%} [HTM]Get {} of 100 in page {}.Totally {} pages {} articles'.format(crawled_pages/float(totalArticles),id, currentPage,totalPages,totalArticles))
                     browser.set_page_load_timeout(6)
@@ -287,8 +287,8 @@ while 1:
 	try:
     		crawlFectiva(browser,checkpoint)
 		break;
-	except TimeoutException:
-		logger.error('Timeout during crawling pages')
+	except TimeoutException as e:
+		logger.error('Timeout during crawling pages, error message:{}'.format(e))
 		browser.close()
 	except UnexpectedAlertPresentException:
     		logger.error('Fectiva alert:We are unable to process your request at this time.  Please try again in a few minutes.')
