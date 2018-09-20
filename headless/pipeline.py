@@ -11,7 +11,11 @@ def processItem(id,title,author,content,date,crawldate,url,source):
     """ put item into mysql database """
     
     try:
-	content = MySQLdb.escape_string(content)
+	content = MySQLdb.escape_string(content).decode('utf-8','ignore').encode("utf-8")
+	url = MySQLdb.escape_string(url)
+	source = MySQLdb.escape_string(source)
+	title  = MySQLdb.escape_string(title).decode('utf-8','ignore').encode("utf-8")
+	author = MySQLdb.escape_string(author)
         sql = "insert into NLP_ARTICLE(ID,title,author,content,date,crawldate,url,source) values('%s','%s','%s','%s','%s','%s','%s','%s')"
         params =(id, title, author,content, date,crawldate,url,source)
 	# excute sql command
@@ -20,9 +24,10 @@ def processItem(id,title,author,content,date,crawldate,url,source):
         # commit changes
         db.commit()
         return 1
-    except:
+    except Exception as e:
+	logger.error('Cannot access database! Error Message:{}'.format(e))
         # Rollback in case there is any error
-#        db.rollback()
+        db.rollback()
         return 0
     # shut donw database
 

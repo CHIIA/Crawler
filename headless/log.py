@@ -58,7 +58,7 @@ ch.setLevel(logging.INFO)
 
 dh = LogToMysqlHandler('NLP_SPIDER','log')
 dh.setLevel(logging.INFO)
-formatter = logging.Formatter('[%(asctime)s][%(levelname)s][%(filename)s] ## %(message)s')
+formatter = logging.Formatter('[%(asctime)s][%(levelname)s] ## %(message)s')
 fh.setFormatter(formatter) 
 ch.setFormatter(formatter) 
    

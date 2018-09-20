@@ -239,21 +239,24 @@ def crawlFectiva(browser,checkpoint):
                     	window_main = browser.window_handles[0]
                     	window_download = browser.window_handles[-1]
                     	browser.switch_to_window(window_download)
-                    	sleep(3)
+                    	sleep(4)
                     	url = browser.current_url
                     	logger.debug('Try to get html page source')
                         content = browser.page_source
-                        logger.info('Get website success.')
+                        logger.debug('Get website success.')
                     except:
-                        content = '<h1><a href="{}">Link</h1>'.format(url)
+			url = browser.current_url
+                        content = "<h1><a href='{}'>baidu</a></h1>".format(url)
                         logger.warning('No response from {} of page {} title:{}, url:{}'.format(documentID,currentPage,title,url))
                         
                     logger.debug('id:{}, documentID:{}, Headline:{}, date:{}, author:{} '.format(id,documentID,title,date,author))
                     date = parse(date).strftime('%Y-%m-%d')
                     crawldate = parse(str(datetime.now())).strftime('%Y-%m-%d')
                     processItem(documentID,title,author,content,date,crawldate,url,source)
-
-                    browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + 'w')
+                    try:
+                        browser.execute_script('window.close();')     
+                    except:
+                        logger.debug('Close tab error')               
                     browser.switch_to_window(window_main)
                     
                     
@@ -290,9 +293,9 @@ while 1:
 	except UnexpectedAlertPresentException:
     		logger.error('Fectiva alert:We are unable to process your request at this time.  Please try again in a few minutes.')
 		browser.close()
-	#except Exception as e:
-		#logger.error('Critical error occured, because {}. restart crawler'.format(e))
-		#browser.close()
+	except Exception as e:
+		logger.error('Critical error occured, because {}. restart crawler'.format(e))
+		browser.close()
 logger.info('Finish!')
 browser.close()
 
