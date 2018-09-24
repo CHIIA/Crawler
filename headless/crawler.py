@@ -68,16 +68,10 @@ def loginFectiva(browser,settings,account,pwd):
                 logger.info("Gateway: ANULIB")
             else:
                 logger.error("Please Set Cookie Gateway!")
-            logger.info('Start login fectiva...')           
+            logger.info('Start login fectiva...')
             wait = WebDriverWait(browser, 40)
             browser.get_screenshot_as_file("logs/login.png")
             btn = wait.until(EC.presence_of_element_located((By.ID, 'btnSearchBottom')))
-            #swith from smart search to fix search
-            switch = browser.find_element_by_id("switchbutton")
-            switch.click()
-            sleep(1)
-            input = browser.find_element_by_id('ftx')
-            input.send_keys(settings['term'])
             #select searching date
             dr = Select(browser.find_element_by_name('dr'))
             dr.select_by_visible_text('Enter date range...')
@@ -97,8 +91,7 @@ def loginFectiva(browser,settings,account,pwd):
             toy.send_keys(settings['endDate']['toy'])
             filter = Select(browser.find_element_by_name('isrd'))
             filter.select_by_visible_text('Off')
-            search_button = browser.find_element_by_id('btnSearchBottom')
-            search_button.click()
+            browser.execute_script('document.getElementById("ftx").value="{}";doLinkSubmit("../ha/default.aspx");'.format(settings['term']))
             headlineFrame = wait.until(EC.presence_of_element_located((By.ID, 'headlineFrame')))
             browser.get_screenshot_as_file("logs/search.png")
             FLAG_LOGIN = True
@@ -110,7 +103,7 @@ def loginFectiva(browser,settings,account,pwd):
 #            browser.close()
         except TimeoutException:
             logger.error('Timeout during login')
-            browser.get_screenshot_as_file("logs/capture.png")
+            browser.get_screenshot_as_file("logs/Timeout.png")
             #browser.close()
     list_cookies = browser.get_cookies()
     cookies=dict()
@@ -118,7 +111,26 @@ def loginFectiva(browser,settings,account,pwd):
         cookies[item['name']] = item['value']
 
     return json.dumps(cookies)
-
+def getOverview(browser,settings):
+    totalWebNews = browser.find_element_by_xpath('//span[@data-channel="Website"][1]/a/span[@class="hitsCount"]').text.replace(',','')
+    totalWebNews = int(re.search(r'\((.*)\)',totalWebNews).group(1))
+    totalBlogs = browser.find_element_by_xpath('//span[@data-channel="Blog"][1]/a/span[@class="hitsCount"]').text.replace(',','')
+    totalBlogs = int(re.search(r'\((.*)\)',totalBlogs).group(1))
+    totalFectiva = browser.find_element_by_xpath('//span[@data-channel="Dowjones"][1]/a/span[@class="hitsCount"]').text.replace(',','')
+    totalFectiva = int(re.search(r'\((.*)\)',totalFectiva).group(1))
+    totalPublication = browser.find_element_by_xpath('//span[@data-channel="Publication"][1]/a/span[@class="hitsCount"]').text.replace(',','')
+    totalPublication = int(re.search(r'\((.*)\)',totalPublication).group(1))
+    maxPage = max(totalWebNews,totalBlogs,totalFectiva,totalPublication)/100
+    timePeriod = (settings['endDate']['date']-settings['startDate']['date'])
+    timesplit = int(math.ceil(maxPage / 100.0))
+    logger.info('split:{}'.format(timesplit))
+    endDateSplit=[settings['startDate']['date'] + timePeriod / (split+1)  for split in range(timesplit)]
+    endDateSplit.reverse()
+    startDateSplit = [settings['endDate']['date'] - timePeriod / (split+1)   for split in range(timesplit)]
+    logger.info('Summary: there are {} in WebNews, {} in Blog, {} in Dowjones, {} in Publication; Maximum pages:{} timePeriod:{},startDateSplit: {}'.format(totalWebNews,totalBlogs,totalFectiva,totalPublication,maxPage,endDateSplit,startDateSplit))
+    
+    status={'crawled_pages': 0,'totalArticles': totalWebNews + totalBlogs + totalFectiva + totalPublication}
+    return [(start,end) for start,end in zip(startDateSplit,endDateSplit)],status
 def getStatus(browser):
     #Compute the total pages we need to download
     
@@ -127,10 +139,6 @@ def getStatus(browser):
     articlesInThisPage = int(re.search(r'Headlines (.*) - (.*) of (.*)',pageInfo).group(2)) - int(re.search(r'Headlines (.*) - (.*) of (.*)',pageInfo).group(1)) + 1
     totalPages = math.ceil((int(re.search(r'Headlines (.*) - (.*) of (.*)',pageInfo).group(3)))/100.0)-1
     nextPageStart = int(re.search(r'Headlines (.*) - (.*) of (.*)',pageInfo).group(2))+1
-#    totalWebNews = browser.find_element_by_xpath('//span[@data-channel="Website"][1]/a/span[@class="hitsCount"]').text.replace(',','')
-#    totalWebNews = int(re.search(r'\((.*)\)',totalWebNews).group(1))
-#    totalBlogs = browser.find_element_by_xpath('//span[@data-channel="Blog"][1]/a/span[@class="hitsCount"]').text.replace(',','')
-#    totalBlogs = int(re.search(r'\((.*)\)',totalBlogs).group(1))
     
     totalArticles = browser.find_element_by_xpath('//span[@data-channel="All"][1]/a/span[@class="hitsCount"]').text.replace(',','')
     totalArticles = int(re.search(r'\((.*)\)',totalArticles).group(1))
@@ -168,12 +176,14 @@ def loadCheckPoint():
         checkpoint = {'Dowjones':0, 'Publication':0, 'Website': 0,'Blog':0}
 
     return checkpoint
-
-def crawlFectiva(browser,checkpoint):
+def resetCheckPoint():
+    checkpoint = {'Dowjones':0, 'Publication':0, 'Website': 0,'Blog':0}
+    saveCheckPoint(checkpoint)
+    logger.info('Reset checkpoint')
+def crawlFectiva(browser,checkpoint,status):
 
 #select = Select(browser.find_element_by_name('hso'))
 #select.select_by_visible_text('Sort by: Oldest first')
-    crawled_pages = 0
     for source in ['Blog','Website','Dowjones','Publication']:
         logger.info('Start crawling articles from: {}...'.format(source))        
         articlesOfChannel = browser.find_element_by_xpath('//span[@data-channel="{}"][1]/a/span[@class="hitsCount"]'.format(source)).text.replace(',','')
@@ -201,20 +211,20 @@ def crawlFectiva(browser,checkpoint):
                 btn_nextpage = browser.find_element_by_xpath('//a[@class="nextItem"]')
                 btn_nextpage.click()
                 wait.until(EC.text_to_be_present_in_element((By.XPATH, '//div[@id="headlines"]/table/tbody/tr[@class="headline"][1]/td[@class="count"]'), '{}.'.format(nextPageStart) ))
-		crawled_pages += 100
+		status['crawled_pages'] += 100
 
             #Compute the total pages we need to download
             currentPage,totalPages,nextPageStart,totalArticles,articlesInThisPage = getStatus(browser)
 
             for id in range(1,articlesInThisPage + 1):
-                crawled_pages +=1
-		updateProgress(min(crawled_pages/float(totalArticles),99.0))
+                status['crawled_pages'] +=1
+		updateProgress(min(status['crawled_pages']/float(status['totalArticles']),99.0))
                 headline,date,author,documentID,documentType = getArticleInfo(browser,id,source)
                 if checkItemExist(documentID):
-                    logger.info('{:.1%} item {} exist in database skip to next one.'.format(crawled_pages/float(totalArticles),id))
+                    logger.info('{:.1%} item {} exist in database skip to next one.'.format(status['crawled_pages']/float(status['totalArticles']),id))
                     continue     
                 if documentType == 'Factiva Licensed Content':
-                    logger.info('{:.1%} [DOC] Get {} of {} in page {}.Totally {} pages {} articles'.format(crawled_pages/float(totalArticles),id,articlesInThisPage, currentPage,totalPages,totalArticles))
+                    logger.info('{:.1%} [DOC] Get {} of {} in page {}.Totally {} pages {} articles'.format(status['crawled_pages']/float(status['totalArticles']),id,articlesInThisPage, currentPage,totalPages,totalArticles))
                     
                     logger.debug('id:{}, documentID:{}, Headline:{}, date:{}, author:{} '.format(id,documentID,headline.text,date,author))
                     headline.click()
@@ -231,7 +241,7 @@ def crawlFectiva(browser,checkpoint):
                     processItem(documentID,title,author,content,date,crawldate,url,source)
                     sleep(2)
                 if documentType == 'HTML':
-                    logger.info('{:.1%} [HTM]Get {} of 100 in page {}.Totally {} pages {} articles'.format(crawled_pages/float(totalArticles),id, currentPage,totalPages,totalArticles))
+                    logger.info('{:.1%} [HTM]Get {} of 100 in page {}.Totally {} pages {} articles'.format(status['crawled_pages']/float(status['totalArticles']),id, currentPage,totalPages,totalArticles))
                     browser.set_page_load_timeout(6)
                     try: 
                     	headline.click()
@@ -277,25 +287,41 @@ def crawlFectiva(browser,checkpoint):
             wait.until(EC.text_to_be_present_in_element((By.XPATH, '//div[@id="headlines"]/table/tbody/tr[@class="headline"][1]/td[@class="count"]'), '{}.'.format(nextPageStart) ))
 
 
+settings = loadSettings()
+browser = webdriver.Chrome(chrome_options=chrome_options, executable_path=chrome_driver)
+loginFectiva(browser,settings,'','')
+
+timeSplit,status = getOverview(browser,settings)
+logger.info('Time split:{}'.format(timeSplit))
+browser.close()
+for (start,end) in timeSplit:
+        logger.info('Now start from {} to {}.'.format(str(start),str(end)))
+	settings['startDate']['frd'] =  start.day
+        settings['startDate']['frm'] =  start.month
+        settings['startDate']['fry'] =  start.year
+        settings['endDate']['tod'] = end.day
+        settings['endDate']['tom'] = end.month
+        settings['endDate']['toy'] = end.year
 
 
-while 1:
-	checkpoint = loadCheckPoint()
-	settings = loadSettings()
-        browser = webdriver.Chrome(chrome_options=chrome_options, executable_path=chrome_driver)	
-        loginFectiva(browser,settings,'','')
-	try:
-    		crawlFectiva(browser,checkpoint)
-		break;
-	except TimeoutException as e:
-		logger.error('Timeout during crawling pages, error message:{}'.format(e))
-		browser.close()
-	except UnexpectedAlertPresentException:
-    		logger.error('Fectiva alert:We are unable to process your request at this time.  Please try again in a few minutes.')
-		browser.close()
-	except Exception as e:
-		logger.error('Critical error occured, because {}. restart crawler'.format(e))
-		browser.close()
+	while True:
+		checkpoint = loadCheckPoint()
+        	browser = webdriver.Chrome(chrome_options=chrome_options, executable_path=chrome_driver)	
+        	loginFectiva(browser,settings,'','')
+		try:
+    			crawlFectiva(browser,checkpoint,status)
+                        resetCheckPoint()
+                        
+			break;
+		except TimeoutException as e:
+			logger.error('Timeout during crawling pages, error message:{}'.format(e))
+			browser.close()
+		except UnexpectedAlertPresentException:
+    			logger.error('Fectiva alert:We are unable to process your request at this time.  Please try again in a few minutes.')
+			browser.close()
+		except Exception as e:
+			logger.error('Critical error occured, because {}. restart crawler'.format(e))
+			browser.close()
 logger.info('Finish!')
 browser.close()
 
