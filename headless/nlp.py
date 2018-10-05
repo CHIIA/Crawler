@@ -9,7 +9,7 @@ for id in relevant:
 	if article:
 		relevant_articles.append(article)
 		#print(article['ID'],article['HD'])
-print('{} relevant articles in given set, found {} of them in database'.format(len(relevant),len(relevant_articles))) 
+print('{} relevant articles in given set, found {} of them in database'.format(len(relevant),len(relevant_articles)))
 for id in irrelevant:
 	article = getArticleByID(id)
 	if article:

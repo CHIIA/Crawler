@@ -2,6 +2,8 @@
 import MySQLdb
 from log import logger
 from bs4 import BeautifulSoup
+from model import modelPredict
+
 db = MySQLdb.connect("localhost", "root", "root", "NLP", charset='utf8')
 settings = {'id':None,'term':None,'startDate':None,'endDate':None}
 
@@ -18,7 +20,13 @@ def processItem(id,title,author,content,date,crawldate,url,source):
 	table_content['source'] = MySQLdb.escape_string(source)
 	table_content['title']  = MySQLdb.escape_string(title).decode('utf-8','ignore').encode("utf-8")
 	table_content['author'] = MySQLdb.escape_string(author)
-        key_list =''
+        if table_content['source']=='Publication' or table_content['source']=='Dowjones':
+                table_content['likelyhood']=modelPredict(table_content['HD'],table_content['LP'],table_content['TD'])
+        else:
+                table_content['likelyhood']=modelPredict(table_content['title'],'',table_content['content'])        
+	logger.debug('model inference likelihood is:{}'.format(table_content['likelyhood']))
+	#form key value pair of content such as hd,lp,td
+	key_list =''
 	value_list = ''
 	for key in table_content:
 		key_list = key_list +',' + key
@@ -26,17 +34,15 @@ def processItem(id,title,author,content,date,crawldate,url,source):
 	key_list=key_list[1:]
 	value_list=value_list[1:]
 	sql = "insert into NLP_ARTICLE({}) values({})".format(key_list,value_list)
-#        print(key_list,value_list)
-#        sql = "insert into NLP_ARTICLE(ID,title,author,content,date,crawldate,url,source) values('%s','%s','%s','%s','%s','%s','%s','%s')"
-        params =(id, title, author,content, date,crawldate,url,source)
 	# excute sql command
         cursor = db.cursor()
         cursor.execute(sql)
         # commit changes
         db.commit()
-        return 1
+	
+	return table_content['likelyhood']
     except Exception as e:
-	logger.error('Cannot access database! Error Message:{}'.format(e))
+	logger.error('Cannot put this into  database! Error Message:{}'.format(e))
         # Rollback in case there is any error
         db.rollback()
         return 0
@@ -84,6 +90,9 @@ def updateProgress(progress):
 	db.commit() 
 def processField(html,source):
         table_content = dict()
+	table_content['HD'] = ''
+	table_content['LP'] = ''
+	table_content['TD'] = ''
         if source not in ['Publication','Dowjones']:
 		return table_content 
 	soup = BeautifulSoup(html,features="html.parser")
@@ -97,12 +106,12 @@ def processField(html,source):
 	return table_content
 
 def getArticleByID(id):
-	sql = "select ID,HD,LP,TD from NLP_ARTICLE where ID = '%s'" % id
+	sql = "select ID,HD,LP,TD,source from NLP_ARTICLE where ID = '%s'" % id
 	cursor = db.cursor()
 	cursor.execute(sql)
 	result = (cursor.fetchone())
 	if result:
-		article={'ID':result[0],'HD':result[1],'LP':result[2],'TD':result[3]}
+		article={'ID':result[0],'HD':result[1],'LP':result[2],'TD':result[3],'source':result[4] }
 		return article
 	else:
 		return

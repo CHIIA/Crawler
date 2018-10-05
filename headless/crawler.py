@@ -22,9 +22,9 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-
+#This only for outside ANU login, if server is located at ANU, we don't need it.
 anuID=[
-       {'id':'u6274652','psw':'ly_game219'},
+       {'id':'u6xxxxx','psw':'xx'},
        ]
 
 GATEWAY = 'ANULIB'
@@ -124,10 +124,14 @@ def getOverview(browser,settings):
     timePeriod = (settings['endDate']['date']-settings['startDate']['date'])
     timesplit = int(math.ceil(maxPage / 100.0))
     logger.info('split:{}'.format(timesplit))
-    endDateSplit=[settings['startDate']['date'] + timePeriod / (split+1)  for split in range(timesplit)]
-    endDateSplit.reverse()
-    startDateSplit = [settings['endDate']['date'] - timePeriod / (split+1)   for split in range(timesplit)]
-    logger.info('Summary: there are {} in WebNews, {} in Blog, {} in Dowjones, {} in Publication; Maximum pages:{} timePeriod:{},startDateSplit: {}'.format(totalWebNews,totalBlogs,totalFectiva,totalPublication,maxPage,endDateSplit,startDateSplit))
+    if timePeriod.days < 5:#if it is in a small period , no split for date
+	startDateSplit = [settings['startDate']['date']]
+    	endDateSplit = [settings['endDate']['date']]
+    else:
+    	endDateSplit=[settings['startDate']['date'] + timePeriod / (split+1)  for split in range(timesplit)]
+    	endDateSplit.reverse()
+    	startDateSplit = [settings['endDate']['date'] - timePeriod / (split+1)   for split in range(timesplit)]
+    logger.info('Summary: there are {} in WebNews, {} in Blog, {} in Dowjones, {} in Publication; Maximum pages:{} timePeriod:{},startDateSplit: {}'.format(totalWebNews,totalBlogs,totalFectiva,totalPublication,maxPage,timePeriod,startDateSplit))
     
     status={'crawled_pages': 0,'totalArticles': totalWebNews + totalBlogs + totalFectiva + totalPublication}
     return [(start,end) for start,end in zip(startDateSplit,endDateSplit)],status
@@ -218,13 +222,12 @@ def crawlFectiva(browser,checkpoint,status):
 
             for id in range(1,articlesInThisPage + 1):
                 status['crawled_pages'] +=1
-		updateProgress(min(status['crawled_pages']/float(status['totalArticles']),99.0))
+		updateProgress(min(status['crawled_pages']/float(status['totalArticles']),0.99))
                 headline,date,author,documentID,documentType = getArticleInfo(browser,id,source)
                 if checkItemExist(documentID):
                     logger.info('{:.1%} item {} exist in database skip to next one.'.format(status['crawled_pages']/float(status['totalArticles']),id))
                     continue     
                 if documentType == 'Factiva Licensed Content':
-                    logger.info('{:.1%} [DOC] Get {} of {} in page {}.Totally {} pages {} articles'.format(status['crawled_pages']/float(status['totalArticles']),id,articlesInThisPage, currentPage,totalPages,totalArticles))
                     
                     logger.debug('id:{}, documentID:{}, Headline:{}, date:{}, author:{} '.format(id,documentID,headline.text,date,author))
                     headline.click()
@@ -238,10 +241,10 @@ def crawlFectiva(browser,checkpoint,status):
                     date = parse(date).strftime('%Y-%m-%d')
                     crawldate = parse(str(datetime.now())).strftime('%Y-%m-%d')
                     url = ''
-                    processItem(documentID,title,author,content,date,crawldate,url,source)
+                    likelihood = processItem(documentID,title,author,content,date,crawldate,url,source)
+                    logger.info('{:.1%} [DOC] Get {} of {} in page {}.Totally {} pages {} articles, likelihood: {:.2}'.format(status['crawled_pages']/float(status['totalArticles']),id,articlesInThisPage, currentPage,totalPages,totalArticles,likelihood))
                     sleep(2)
                 if documentType == 'HTML':
-                    logger.info('{:.1%} [HTM]Get {} of 100 in page {}.Totally {} pages {} articles'.format(status['crawled_pages']/float(status['totalArticles']),id, currentPage,totalPages,totalArticles))
                     browser.set_page_load_timeout(6)
                     try: 
                     	headline.click()
@@ -262,7 +265,8 @@ def crawlFectiva(browser,checkpoint,status):
                     logger.debug('id:{}, documentID:{}, Headline:{}, date:{}, author:{} '.format(id,documentID,title,date,author))
                     date = parse(date).strftime('%Y-%m-%d')
                     crawldate = parse(str(datetime.now())).strftime('%Y-%m-%d')
-                    processItem(documentID,title,author,content,date,crawldate,url,source)
+                    likelihood = processItem(documentID,title,author,content,date,crawldate,url,source)
+                    logger.info('{:.1%} [HTM]Get {} of 100 in page {}.Totally {} pages {} articles, likelihood: {:.2}'.format(status['crawled_pages']/float(status['totalArticles']),id, currentPage,totalPages,totalArticles,likelihood))
                     try:
                         browser.execute_script('window.close();')     
                     except:
@@ -288,6 +292,7 @@ def crawlFectiva(browser,checkpoint,status):
 
 
 settings = loadSettings()
+resetCheckPoint()
 browser = webdriver.Chrome(chrome_options=chrome_options, executable_path=chrome_driver)
 loginFectiva(browser,settings,'','')
 
@@ -305,6 +310,7 @@ for (start,end) in timeSplit:
 
 
 	while True:
+		crawled = status['crawled_pages']
 		checkpoint = loadCheckPoint()
         	browser = webdriver.Chrome(chrome_options=chrome_options, executable_path=chrome_driver)	
         	loginFectiva(browser,settings,'','')
@@ -314,14 +320,18 @@ for (start,end) in timeSplit:
                         
 			break;
 		except TimeoutException as e:
+			status['crawled_pages'] = crawled#resume to previous count because of error
 			logger.error('Timeout during crawling pages, error message:{}'.format(e))
 			browser.close()
 		except UnexpectedAlertPresentException:
+			status['crawled_pages'] = crawled
     			logger.error('Fectiva alert:We are unable to process your request at this time.  Please try again in a few minutes.')
 			browser.close()
 		except Exception as e:
+			status['craled_pages'] = crawled
 			logger.error('Critical error occured, because {}. restart crawler'.format(e))
 			browser.close()
+updateProgress(1.0)
 logger.info('Finish!')
 browser.close()
 
